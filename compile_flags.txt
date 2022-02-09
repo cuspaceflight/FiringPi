@@ -1,5 +1,0 @@
--I
-./inc
--l
-ncurses
--std=c++2a
