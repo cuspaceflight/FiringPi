@@ -21,17 +21,16 @@ $ ssh -tt cusf@10.9.36.130 "cd cft-controller && make && exec ./main"
 ## Project Structure
 ```markdown
 project
-├── compile_flags.txt
-├── inc
+├── inc           -> c++ headers
 │   └── mux.hpp
-├── main
+├── [main]        -> compiled binary
 ├── makefile
-├── obj
+├── obj           -> build directory
 │   ├── main.o
 │   └── mux.o
-├── pi
+├── pi         
 ├── README.md
-└── src
+└── src           -> c++ sources
     ├── main.cpp
     └── mux.cpp
 ```
