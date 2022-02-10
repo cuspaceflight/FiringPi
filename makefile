@@ -13,7 +13,7 @@ OBJECTS := $(patsubst src%,obj%, $(patsubst %.c,%.o, $(patsubst %.cpp,%.o,$(SOUR
 
 INCLUDE := -I. -I./inc
 LIBPATH :=
-LIBS := -lncurses
+LIBS := -lncursesw
 
 FLAGS := -Wall
 CCFLAGS := $(FLAGS) -std=c99
@@ -24,6 +24,7 @@ CXX := g++
 
 all: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OBJECTS) -o $(TARGET) $(LIBPATH) $(LIBS)
+
 
 %.o: ../src/%.c
 	$(CC) $(CCFLAGS) $(INCLUDE) -c $< -o $@

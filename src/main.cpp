@@ -22,7 +22,8 @@ enum State {
 const int num_states = OFF+1;
 
 // names of states
-std::array<const char*,num_states> state_names{
+// std::array<const char*,num_states> state_names{
+const char *state_names[num_states] {
   "SAFE", 
   "ARMED",
   "STARTUP",
@@ -33,8 +34,19 @@ std::array<const char*,num_states> state_names{
   "OFF"
 };
 
+const int state_colors[num_states] {
+  10,
+  11,
+  12,
+  12,
+  12,
+  9,
+  9,
+  0
+};
+
 // permissible states accessible from a given state
-bool allowed_states [num_states][num_states] {
+bool state_transition_matrix [num_states][num_states] {
 // SAFE   ARMED   STARTUP FIRING SHUTDOWN ABORT   ERROR   OFF
   {true,  true,   false,  false,  false,  false,  true,   true},  //SAFE
   {true,  true,   true,   false,  false,  false,  true,   false},  //ARMED
@@ -57,21 +69,31 @@ void reinitwin(WINDOW * win, int height, int width, int starty,int startx)
   wrefresh(win);
 }
 
-void draw_state(WINDOW * win, State state)
+void draw_state(WINDOW *win, State state)
 {
-  attron(A_REVERSE);
+  attron(COLOR_PAIR(state_colors[state])|A_REVERSE);
   mvprintw(3,5,"                ");
   mvprintw(4,5," CURRENT STATE  ");
   mvprintw(5,5,"                ");
-  attroff(A_REVERSE);
+  attroff(COLOR_PAIR(state_colors[state])|A_REVERSE);
   for (int i=0; auto state_name: state_names) 
   {
     if (state==i) { attron(A_REVERSE); }  
-    else if (!allowed_states[state][i]) { attron(A_DIM); }
+    else if (!state_transition_matrix[state][i]) { attron(A_DIM); }
     mvprintw(2*i+7, 7, state_name);
     i++;
     attroff(A_REVERSE|A_DIM);
   };
+}
+
+void draw_colors()
+{
+  for (int i=0; i<COLORS; i++)
+  {
+    attron(COLOR_PAIR(i));
+    mvprintw(15+(i%12), 30+4*(i/12), "%d", i);
+    attroff(COLOR_PAIR(i));
+  }
 }
 
 int main()
@@ -83,7 +105,6 @@ int main()
   // ncurses stuff
   setlocale(LC_ALL, "");
   WINDOW *main_win, *state_win, *valves_win;
-  int ch;
 
   initscr();
   start_color();
@@ -93,18 +114,29 @@ int main()
   cbreak();
   refresh();
 
-  init_pair(1, COLOR_GREEN, COLOR_BLACK);
+  if (has_colors() && can_change_color())
+  {
+    for (NCURSES_COLOR_T i; i<COLORS; i++)
+    {
+      init_pair(i, i, COLOR_BLACK);
+    }
+  }
 
   main_win = newwin(0,0,1,1);
   state_win = newwin(0,0,2,24);
   valves_win = newwin(0,0,2,3);
 
   ungetch(KEY_RESIZE);
+
+  bool exit {};
   
-  while((ch = getch()) != 'q')
+  while(!exit)
   {
-    switch (ch)
+    switch (getch())
     {
+      case 'q':
+        if (state==OFF) { exit = true; }
+        mvprintw(0,6,"MUST BE POWERED OFF TO EXIT: ENTER SAFE STATE THEN PRESS 'o'"); break;
       case KEY_RESIZE:
         wclear(stdscr);
         refresh();
@@ -117,23 +149,18 @@ int main()
         requested = SAFE; break;
       case 'a'-96:
         requested = ARMED; break;
+      // TODO FOR DEBUG
+      case ' ': 
+        requested = (State)(state + 1); break;
       case KEY_BACKSPACE:
         requested = ABORT; break;
       case 'o':
         requested = OFF;
-
-
-       
     }
-    if (allowed_states[state][requested]) { state = requested; }
-
+    if (state_transition_matrix[state][requested] & requested<num_states) { state = requested; }
     draw_state(state_win,state);
-    mvprintw(0, 0, "    ");
-    mvaddch(0,0,'0'+state);
-    mvaddch(0,2,ch);
-
   }
-  endwin();
+  endwin();  
   return 0;
 }
 
