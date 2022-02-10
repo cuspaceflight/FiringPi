@@ -5,6 +5,7 @@ This project is designed to be run on a Raspberry Pi connected to various periph
 To build on your local machine, you will need a native cross-compiler such as [gcc/g++](https://www.gnu.org/software/gcc/) (You can change the compiler by editing the variable $(GXX) in a local copy of the makfile and specifying `-f <local.makefile>` in the make command. The project uses ncurses for a TUI, which works over standard ssh tty. You will therefore need to make sure you have `libncurses5-dev` and `libncursesw5-dev` installed. When running on the Raspberry Pi, `wiringPi` is used for gpio access, which will need to be installed on your local machine to compile, if you wish to do so. All of these are already installed on the flight computer.
 
 ## Building and running
+Clone the repo, then manually create the [/obj] directory with ```mdkir obj```.
 For a local build, use the makefile.
 ```console
 $ make && ./main
@@ -23,9 +24,9 @@ $ ssh -tt cusf@10.9.36.130 "cd cft-controller && make && exec ./main"
 project
 ├── inc           -> c++ headers
 │   └── mux.hpp
-├── [main]        -> compiled binary
+├── [main]        -> compiled binary (generate during build)
 ├── makefile
-├── obj           -> build directory
+├── obj           -> build directory (make before first build)
 │   ├── main.o
 │   └── mux.o
 ├── pi         
