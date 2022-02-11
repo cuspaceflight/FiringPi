@@ -17,13 +17,11 @@ enum State {
   ABORT,
   ERROR,
   OFF,
+  NUM_STATES
 };
 
-const int num_states = OFF+1;
-
 // names of states
-// std::array<const char*,num_states> state_names{
-const char *state_names[num_states] {
+const char *state_names[NUM_STATES] {
   "SAFE", 
   "ARMED",
   "STARTUP",
@@ -34,7 +32,7 @@ const char *state_names[num_states] {
   "OFF"
 };
 
-const int state_colors[num_states] {
+const int state_colors[NUM_STATES] {
   10,
   11,
   12,
@@ -46,7 +44,7 @@ const int state_colors[num_states] {
 };
 
 // permissible states accessible from a given state
-bool state_transition_matrix [num_states][num_states] {
+bool state_transition_matrix [NUM_STATES][NUM_STATES] {
 // SAFE   ARMED   STARTUP FIRING SHUTDOWN ABORT   ERROR   OFF
   {true,  true,   false,  false,  false,  false,  true,   true},  //SAFE
   {true,  true,   true,   false,  false,  false,  true,   false},  //ARMED
@@ -190,7 +188,7 @@ int main()
       }
     }
      
-    if (state_transition_matrix[state][requested] && ((int)requested<num_states) && state != requested) {
+    if (state_transition_matrix[state][requested] && ((int)requested<NUM_STATES) && state != requested) {
       state = requested;
       hint="";
     }

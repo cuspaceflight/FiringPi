@@ -25,13 +25,13 @@ ssh -tt cusf@<pi-addr> "cd cft-controller && make && exec ./main"
 ```
 
 ## Using the Program {curly brackets mean TODO} 
-Once you have launched the TUI successfully, you must launch the system into SAFE mode by pressing <s[afe]>.
-The system may be armed by pressing <CTRL-A>, and once you are satisfied that the firing is safe, STARTUP mode may be entered by pressing <SPACE>.
+Once you have launched the TUI successfully, you must launch the system into SAFE mode by pressing s[afe].
+The system may be armed by pressing <CTRL-A>, then {once you are satisfied that the system has booted correctly,} STARTUP mode may be entered by pressing <SPACE>.
 The computer will then enter STARTUP, followed by FIRING and SHUTDOWN {as it runs the preconfigured fire sequence}.
 An ABORT may be triggered by pressing <BACKSPACE> {or automatically by the system detecting unsafe parameters}. 
 ABORT mode can only be exitied by the computer, for safety reasons.
-SHUTDOWN exits to SAFE, and ABORT exits to ERROR, from which SAFE mode can be entered by pressing <s>.
-To quit the program, the system must first be in the OFF state, entered by pressing <o[ff]> from SAFE mode, only then it will exit when <q[uit]> is pressed.
+SHUTDOWN exits to SAFE, and ABORT exits to ERROR, from which SAFE mode can be entered by pressing s[afe].
+To quit the program, the system must first be in the OFF state, entered by pressing o[ff] from SAFE mode, only then it will exit when q[uit] is pressed.
 
 ## Project Structure
 ```markdown
