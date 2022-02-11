@@ -5,21 +5,19 @@ The utility files only run on linux, but you should be able to work out equivale
 ## Requirements
 To build on your local machine, you will need a native cross-compiler such as [gcc/g++](https://www.gnu.org/software/gcc/) (You can change the compiler by editing the variable `$(GXX)` in a local copy of the makfile and specifying `-f <local.makefile>` in the make command.
 The project uses [ncurses](https://invisible-island.net/ncurses/announce.html) for its TUI, which works over standard ssh tty.
-You will therefore need to make sure you have `libncurses5-dev` and `libncursesw5-dev` installed.
-When running on the Raspberry Pi, [WiringPi](http://wiringpi.com/) is used for gpio access, which will need to be installed on your local machine to compile if you wish to do so.
+You will therefore need to make sure you have at least `libncurses5-dev` and `libncursesw5-dev` installed.
+When running on the Raspberry Pi, [WiringPi](http://wiringpi.com/) is used for gpio access, which will need to be installed on your local machine to compile if you wish to do so. 
+The raspberry Pi also uses [tmux](https://linuxhandbook.com/tmux/) to manage disconnects safely (the system leaving all of the valves open after an unhandled disconnect would not be good), so if you use the scripy [/pi](/pi), then you will also require this.
 All of these are already installed on the flight computer.
 
 ## Building and running
-Clone the repo, then manually create the build directory with `mdkir obj`.
+Clone the repo, then assert the directory is set up correctly with `make clean`.
 For a local build, use the makefile:
 ```console
 make && ./main
 ```
-To build on the Pi, you need to have ssh access, and make sure you have updated its IP address in [/pi](pi). This file contains a script to upload source code directly to the Pi (with rsync, no need for a git sync) and execute it over ssh, forcing interactive terminal allocation so you can use the TUI. Using the script:
-```console
-./pi
-```
-Or just to run without building (will add options to [/pi](pi) for this in the future)
+To build on the Pi, you need to have ssh access, and make sure you have updated its IP address in either [/pi](/pi). This file contains a script to upload source code directly to the Pi (with scp, no need for a git sync) and execute it over ssh, forcing interactive terminal allocation so you can use the TUI. Running the file [/pi](pi) on Windows or Linux will result in these commands being run, as they are cross-platform syntatically identical so use the same file.
+You can also just to run the executable on the pi without building (will add options to [/pi](pi) for this in the future).
 ```console
 ssh -tt cusf@<pi-addr> "cd cft-controller && make && exec ./main"
 ```

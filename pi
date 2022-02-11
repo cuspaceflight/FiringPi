@@ -1,2 +1,2 @@
-rsync -Ravz `find inc/* src/*` cusf@10.9.36.130:cft-controller/ &&
-ssh -tt cusf@10.9.36.130 "cd cft-controller && make && exec ./main"
+rsync -rvh inc src cusf@10.9.36.130:cft-controller/ &&
+ssh -tt cusf@10.9.36.130 "make -C cft-controller && tmux -2 new -d ./cft-controller/main \; attach"

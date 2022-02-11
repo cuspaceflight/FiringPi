@@ -31,7 +31,7 @@ CC := gcc
 CXX := g++
 
 
-all: $(OBJECTS)
+$(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OBJECTS) -o $(TARGET) $(LIBPATH) $(LIBS)
 
 

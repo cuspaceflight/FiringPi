@@ -60,7 +60,7 @@ bool SOLENOID[3]{0};
 
 void reinitwin(WINDOW * win, int height, int width, int starty,int startx)
 {
-  wmove(win, starty, startx);
+  mvwin(win, starty, startx);
   wresize(win, height, width);
   wclear(win);
   box(win,0,0);
@@ -84,6 +84,24 @@ void draw_state(WINDOW *win, State state)
   };
 }
 
+void init_ncurses()
+{
+  setlocale(LC_ALL, "");
+  initscr();
+  start_color();
+  noecho();
+  cbreak();
+  curs_set(FALSE);
+  nodelay(stdscr,TRUE);
+  keypad(stdscr, TRUE);
+  refresh();
+
+  for (int i=0; i<COLORS && i<COLOR_PAIRS; i++)
+  {
+    init_pair(i, i, COLOR_BLACK);
+  }
+}
+
 void draw_colors()
 {
   for (int i=0; i<COLORS; i++)
@@ -99,27 +117,11 @@ int main()
   // systems stuff
   State state = OFF;
   State requested = OFF;
-
+  
+  init_ncurses();
   // ncurses stuff
-  setlocale(LC_ALL, "");
   WINDOW *main_win, *state_win, *valves_win;
-
-  initscr();
-  start_color();
-  noecho();
-  cbreak();
-  curs_set(FALSE);
-  nodelay(stdscr,TRUE);
-  keypad(stdscr, TRUE);
-  refresh();
-
-  if (has_colors() && can_change_color())
-  {
-    for (NCURSES_COLOR_T i; i<COLORS; i++)
-    {
-      init_pair(i, i, COLOR_BLACK);
-    }
-  }
+  
 
   main_win = newwin(0,0,1,1);
   state_win = newwin(0,0,2,24);
@@ -141,13 +143,15 @@ int main()
       case 'q':
         if (state==OFF) { exit = true; }
         hint = "MUST BE POWERED OFF TO EXIT: ENTER s[afe] STATE THEN PRESS o[ff], q[uit]"; break;
+      case 'r':
+        // refresh terminal settings
       case KEY_RESIZE:
         wclear(stdscr);
         refresh();
         //        window      height    width     y x 
         reinitwin(main_win,   LINES-2,  COLS-2,   1,1);
-        reinitwin(state_win,  10,       COLS-27,  3,24);
-        reinitwin(valves_win, LINES-4,  20,       3,3);
+        reinitwin(state_win,  10,       COLS-27,  2,24);
+        reinitwin(valves_win, LINES-4,  20,       2,3);
         break;
       case 's':
         requested = SAFE; break;
@@ -205,4 +209,5 @@ int main()
   endwin();  
   return 0;
 }
+
 
