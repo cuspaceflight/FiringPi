@@ -2,8 +2,8 @@
 #include <iostream>
 #include <ncursesw/curses.h>
 #include <locale.h>
+#include <chrono>
 #include <string>
-#include <array>
 
 #include "mux.hpp"
 
@@ -109,9 +109,10 @@ int main()
   initscr();
   start_color();
   noecho();
-  curs_set(FALSE);
-  keypad(stdscr, TRUE);
   cbreak();
+  curs_set(FALSE);
+  nodelay(stdscr,TRUE);
+  keypad(stdscr, TRUE);
   refresh();
 
   if (has_colors() && can_change_color())
@@ -129,6 +130,11 @@ int main()
   ungetch(KEY_RESIZE);
 
   bool exit {};
+  auto state_alarm = std::chrono::system_clock::now(); // TODO have different alarms to avoid clashes
+  
+  const char* hint = "PRESS s[afe] OR q[uit]";
+  cchar_t space {};
+  setcchar(&space, L" ", 0, 0, (void*)0);
   
   while(!exit)
   {
@@ -136,7 +142,7 @@ int main()
     {
       case 'q':
         if (state==OFF) { exit = true; }
-        mvprintw(0,6,"MUST BE POWERED OFF TO EXIT: ENTER SAFE STATE THEN PRESS 'o'"); break;
+        hint = "MUST BE POWERED OFF TO EXIT: ENTER s[afe] STATE THEN PRESS o[ff], q[uit]"; break;
       case KEY_RESIZE:
         wclear(stdscr);
         refresh();
@@ -151,14 +157,52 @@ int main()
         requested = ARMED; break;
       // TODO FOR DEBUG
       case ' ': 
-        requested = (State)(state + 1); break;
+        requested = STARTUP; 
+        state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(1000); 
+        break;
       case KEY_BACKSPACE:
-        requested = ABORT; break;
+        requested = ABORT;
+        state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(1500); 
+        break;
       case 'o':
         requested = OFF;
     }
-    if (state_transition_matrix[state][requested] & requested<num_states) { state = requested; }
+
+    if (std::chrono::system_clock::now() > state_alarm) {
+      switch (state) 
+      {
+        case STARTUP:
+          requested=FIRING;
+          state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(3000); 
+          break;
+        case FIRING:
+          requested=SHUTDOWN;
+          state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(1000); 
+          break;
+        case SHUTDOWN:
+          requested=SAFE;
+          break;
+        case ABORT:
+          requested=ERROR;
+          break;
+        default:
+          break;
+      }
+    }
+     
+    if (state_transition_matrix[state][requested] && ((int)requested<num_states) && state != requested) {
+      state = requested;
+      hint="";
+    }
+    
     draw_state(state_win,state);
+    // draw_colors();
+    
+    mvhline_set(0, 0, &space, COLS); 
+
+    attron(COLOR_PAIR(3));
+    mvprintw(0, 2, hint);
+    attroff(A_COLOR);
   }
   endwin();  
   return 0;
