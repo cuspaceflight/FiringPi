@@ -11,7 +11,7 @@ All of these are already installed on the flight computer.
 
 ## Building and running
 Clone the repo, then manually create the build directory with `mdkir obj`.
-For a local build, use the makefile:
+For a local build on your device or the Pi, use the makefile:
 ```console
 make && ./main
 ```
@@ -19,7 +19,7 @@ To build on the Pi, you need to have ssh access, and make sure you have updated 
 ```console
 ./pi
 ```
-Or just to run without building (will add options to [/pi](pi) for this in the future)
+Or just to run without building over ssh (will add options to [/pi](pi) for this in the future)
 ```console
 ssh -tt cusf@<pi-addr> "cd cft-controller && make && exec ./main"
 ```
