@@ -16,10 +16,11 @@ For a local build, use the makefile:
 ```console
 make && ./main
 ```
-To build on the Pi, you need to have ssh access, and make sure you have updated its IP address in either [/pi](/pi). This file contains a script to upload source code directly to the Pi (with scp, no need for a git sync) and execute it over ssh, forcing interactive terminal allocation so you can use the TUI. Running the file [/pi](pi) on Windows or Linux will result in these commands being run, as they are cross-platform syntatically identical so use the same file.
-You can also just to run the executable on the pi without building (will add options to [/pi](pi) for this in the future).
+To build on the Pi, you need to have ssh access, and make sure you have updated its IP address in either [/pi](/pi).
+This file contains a script to upload source code directly to the Pi (with scp, no need for a git sync) and execute it over ssh, forcing interactive terminal allocation, then building the projcet on the pi and executing it in a detatched tmux session.
+You can also just run the executable on the pi in tmux without building (will add options to [/pi](pi) for this in the future).
 ```console
-ssh -tt cusf@<pi-addr> "cd cft-controller && make && exec ./main"
+ssh -tt cusf@10.9.36.130 "make -C cft-controller && tmux -2 new -d ./cft-controller/main \; attach"
 ```
 
 ## Using the Program {curly brackets mean TODO} 
