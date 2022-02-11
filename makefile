@@ -6,8 +6,16 @@
 # - obj/
 #     - *.o
 # - main
+ifeq ($(shell echo $$OS),$$OS)
+    MAKEDIR = if not exist "$(1)" mkdir "$(1)"
+    RM = rmdir /S /Q "$(1)"
+else
+    MAKEDIR = '$(SHELL)' -c "mkdir -p \"$(1)\""
+    RM = '$(SHELL)' -c "rm -rf \"$(1)\""
+endif
 
 TARGET := main
+OBJDIR := obj
 SOURCES := $(wildcard src/*.c src/*.cpp)
 OBJECTS := $(patsubst src%,obj%, $(patsubst %.c,%.o, $(patsubst %.cpp,%.o,$(SOURCES))))
 
@@ -22,6 +30,7 @@ CXXFLAGS := $(FLAGS) -std=c++2a
 CC := gcc
 CXX := g++
 
+
 all: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OBJECTS) -o $(TARGET) $(LIBPATH) $(LIBS)
 
@@ -31,12 +40,13 @@ all: $(OBJECTS)
 
 %.o: ../src/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
-
+	
 .PHONY: clean help
 
 clean:
-	rm -rf obj/*
-	rm -f $(TARGET)
+	$(call RM,$(OBJDIR))
+	$(call MAKEDIR,$(OBJDIR))
+	$(call RM,$(TARGET))
 	
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
