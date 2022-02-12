@@ -1,2 +1,24 @@
-rsync -Cavuz inc src cusf@cusfpi:cft-controller/ &&
-ssh -tt cusf@cusfpi "make -C cft-controller && tmux -2 new -d ./cft-controller/main \; attach"
+#!/bin/bash
+
+function usage {
+  echo "Usage: $(basename $0) [-br]" 2>&1
+  echo "                  default: build and run on the Pi"
+  echo "    -b --build    just compile on the Pi"
+  echo "    -r --run      just run the existing binary in the Pi"
+}
+
+
+if [ -z "$1" ] 
+  then
+    rsync -Cavuz inc src cusf@cusfpi:cft-controller/ &&
+      ssh -tt cusf@cusfpi "make -C cft-controller && tmux -2 new -d ./cft-controller/main \; attach"
+  else
+while getopts brg arg; do
+  case $arg in
+    b) rsync -Cavuz inc src cusf@cusfpi:cft-controller/ && ssh -tt cusf@cusfpi "make -C cft-controller" ;;
+    r) ssh -tt cusf@cusfpi "tmux -2 new -d ./cft-controller/main \; attach" ;;
+    ?) usage;;
+  esac
+done
+
+fi
