@@ -5,56 +5,9 @@
 #include <chrono>
 #include <string>
 
-#include "mux.hpp"
+#include "Mux.hpp"
+#include "State.hpp"
 
-// values of states
-enum State {
-  SAFE,
-  ARMED,
-  STARTUP,
-  FIRING,
-  SHUTDOWN,
-  ABORT,
-  ERROR,
-  OFF,
-  NUM_STATES
-};
-
-// names of states
-const char *state_names[NUM_STATES] {
-  "SAFE", 
-  "ARMED",
-  "STARTUP",
-  "FIRING",
-  "SHUTDOWN",
-  "ABORT",
-  "ERROR", // make sure errors are safely handled by abort during firing sequence
-  "OFF"
-};
-
-const int state_colors[NUM_STATES] {
-  10,
-  11,
-  12,
-  12,
-  12,
-  9,
-  9,
-  0
-};
-
-// permissible states accessible from a given state
-bool state_transition_matrix [NUM_STATES][NUM_STATES] {
-// SAFE   ARMED   STARTUP FIRING SHUTDOWN ABORT   ERROR   OFF
-  {true,  true,   false,  false,  false,  false,  true,   true},  //SAFE
-  {true,  true,   true,   false,  false,  false,  true,   false},  //ARMED
-  {false, false,  true,   true,   true,   true,   false,  false}, //STARTUP
-  {false, false,  false,  true,   true,   true,   false,  false}, //FIRING
-  {true,  false,  false,  false,  true,   true,   true,   false}, //SHUTDOWN
-  {false, false,  false,  false,  false,  true,   true,   false}, //ABORT
-  {true,  false,  false,  false,  false,  false,  true,   true},  //ERROR
-  {true,  false,  false,  false,  false,  false,  false,  true}   //OFF
-};  
 
 bool SOLENOID[3]{0};
 
@@ -67,17 +20,17 @@ void reinitwin(WINDOW * win, int height, int width, int starty,int startx)
   wrefresh(win);
 }
 
-void draw_state(WINDOW *win, State state)
+void draw_state(WINDOW *win, StateMachine machine)
 {
-  attron(COLOR_PAIR(state_colors[state])|A_REVERSE);
+  attron(COLOR_PAIR(machine.colors[machine.state])|A_REVERSE);
   mvprintw(3,5,"                ");
   mvprintw(4,5," CURRENT STATE  ");
   mvprintw(5,5,"                ");
-  attroff(COLOR_PAIR(state_colors[state])|A_REVERSE);
-  for (int i=0; auto state_name: state_names) 
+  attroff(COLOR_PAIR(machine.colors[machine.state])|A_REVERSE);
+  for (int i=0; auto state_name: machine.names) 
   {
-    if (state==i) { attron(A_REVERSE); }  
-    else if (!state_transition_matrix[state][i]) { attron(A_DIM); }
+    if (machine.state==i) { attron(A_REVERSE); }  
+    else if (!machine.canChangeTo((StateIndex)i)) { attron(A_DIM); }
     mvprintw(2*i+7, 7, state_name);
     i++;
     attroff(A_REVERSE|A_DIM);
@@ -115,13 +68,11 @@ void draw_colors()
 int main()
 {
   // systems stuff
-  State state = OFF;
-  State requested = OFF;
+  StateMachine machine;
   
-  init_ncurses();
   // ncurses stuff
+  init_ncurses();
   WINDOW *main_win, *state_win, *valves_win;
-  
 
   main_win = newwin(0,0,1,1);
   state_win = newwin(0,0,2,24);
@@ -141,10 +92,8 @@ int main()
     switch (getch())
     {
       case 'q':
-        if (state==OFF) { exit = true; }
+        if (machine.state==OFF) { exit = true; }
         hint = "MUST BE POWERED OFF TO EXIT: ENTER s[afe] STATE THEN PRESS o[ff], q[uit]"; break;
-      case 'r':
-        // refresh terminal settings
       case KEY_RESIZE:
         wclear(stdscr);
         refresh();
@@ -154,50 +103,45 @@ int main()
         reinitwin(valves_win, LINES-4,  20,       2,3);
         break;
       case 's':
-        requested = SAFE; break;
+        machine.changeState(SAFE); break;
       case 'a'-96:
-        requested = ARMED; break;
+        machine.changeState(ARMED); break;
       // TODO FOR DEBUG
       case ' ': 
-        requested = STARTUP; 
+        machine.changeState(STARTUP); 
         state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(1000); 
         break;
       case KEY_BACKSPACE:
-        requested = ABORT;
+        machine.changeState(ABORT);
         state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(1500); 
         break;
       case 'o':
-        requested = OFF;
+        machine.changeState(OFF);
     }
 
     if (std::chrono::system_clock::now() > state_alarm) {
-      switch (state) 
+      switch (machine.state) 
       {
         case STARTUP:
-          requested=FIRING;
+          machine.changeState(FIRING);
           state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(3000); 
           break;
         case FIRING:
-          requested=SHUTDOWN;
+          machine.changeState(SHUTDOWN);
           state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(1000); 
           break;
         case SHUTDOWN:
-          requested=SAFE;
+          machine.changeState(SAFE);
           break;
         case ABORT:
-          requested=ERROR;
+          machine.changeState(ERROR);
           break;
         default:
           break;
       }
     }
      
-    if (state_transition_matrix[state][requested] && ((int)requested<NUM_STATES) && state != requested) {
-      state = requested;
-      hint="";
-    }
-    
-    draw_state(state_win,state);
+    draw_state(state_win,machine);
     draw_colors();
     
     mvhline_set(0, 0, &space, COLS); 
