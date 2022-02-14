@@ -18,35 +18,30 @@ make && ./main
 ```
 To build on the Pi, you need to have ssh access, and make sure you have updated its IP address in either [/pi](/pi).
 This file contains a script to upload source code directly to the Pi (with scp, no need for a git sync) and execute it over ssh, forcing interactive terminal allocation, then building the projcet on the pi and executing it in a detatched tmux session.
-You can also just run the executable on the pi in tmux without building (will add options to [/pi](pi) for this in the future).
-```console
-ssh -tt cusf@10.9.36.130 "make -C cft-controller && tmux -2 new -d ./cft-controller/main \; attach"
-```
+You can also just run the executable on the pi in tmux without building with `./pi -r` or conversely to build without running `./pi -b`
 
 ## Using the Program {curly brackets mean TODO} 
 Once you have launched the TUI successfully, you must launch the system into SAFE mode by pressing s[afe].
 The system may be armed by pressing <CTRL-A>, then {once you are satisfied that the system has booted correctly,} STARTUP mode may be entered by pressing <SPACE>.
 The computer will then enter STARTUP, followed by FIRING and SHUTDOWN {as it runs the preconfigured fire sequence}.
 An ABORT may be triggered by pressing <BACKSPACE> {or automatically by the system detecting unsafe parameters}. 
-ABORT mode can only be exitied by the computer, for safety reasons.
+ABORT mode can only be exitied by the computer, for safety reasons {currently press e[rror] to debug exit}.
 SHUTDOWN exits to SAFE, and ABORT exits to ERROR, from which SAFE mode can be entered by pressing s[afe].
 To quit the program, the system must first be in the OFF state, entered by pressing o[ff] from SAFE mode, only then it will exit when q[uit] is pressed.
 
 ## Project Structure
 ```markdown
 cft-controller
-├── inc           -> c++ headers
-│   └── mux.hpp
-├── [main]        -> compiled binary (generate during build)
+├── build
+│   └── *.o
+├── include
+│   └── *.hpp
+├── [main]
 ├── makefile
-├── obj           -> build directory (make before first build)
-│   ├── main.o
-│   └── mux.o
-├── pi         
+├── pi
 ├── README.md
-└── src           -> c++ sources
-    ├── main.cpp
-    └── mux.cpp
+└── src
+    └── *.cpp
 ```
 
 ## Useful Stuff
