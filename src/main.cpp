@@ -4,6 +4,7 @@
 #include <locale.h>
 #include <chrono>
 #include <string>
+#include <thread>
 
 #include "Mux.hpp"
 #include "State.hpp"
@@ -30,7 +31,7 @@ void draw_state(WINDOW *win, StateMachine machine)
   for (int i=0; auto state_name: machine.names) 
   {
     if (machine.state==i) { attron(A_REVERSE); }  
-    else if (!machine.canChangeTo((StateIndex)i)) { attron(A_DIM); }
+    else if (!machine.canChangeTo((State)i)) { attron(A_DIM); }
     mvprintw(2*i+7, 7, state_name);
     i++;
     attroff(A_REVERSE|A_DIM);
@@ -81,19 +82,34 @@ int main()
   ungetch(KEY_RESIZE);
 
   bool exit {};
-  auto state_alarm = std::chrono::system_clock::now(); // TODO have different alarms to avoid clashes
-  
+  int ch;
+
+  int diff {};
+  float fps {};
+  int stabilizer {16667};
+  auto this_time = std::chrono::system_clock::now();
+  auto last_time = this_time;
+
   const char* hint = "PRESS s[afe] OR q[uit]";
   cchar_t space {};
   setcchar(&space, L" ", 0, 0, (void*)0);
-  
+
   while(!exit)
   {
-    switch (getch())
+    this_time = std::chrono::system_clock::now();
+    diff = 0.8*diff+0.2*std::chrono::duration_cast<std::chrono::microseconds>(this_time-last_time).count();
+    last_time = this_time;  
+    fps=1000000.0/diff;
+    stabilizer += 0.1*(16667-diff); 
+
+    ch = getch();
+    switch (ch)
     {
+      case -1: break;
       case 'q':
         if (machine.state==OFF) { exit = true; }
-        hint = "MUST BE POWERED OFF TO EXIT: ENTER s[afe] STATE THEN PRESS o[ff], q[uit]"; break;
+        hint = "MUST BE POWERED OFF TO EXIT: ENTER s[afe] STATE THEN PRESS o[ff], q[uit]";
+        break;
       case KEY_RESIZE:
         wclear(stdscr);
         refresh();
@@ -102,52 +118,21 @@ int main()
         reinitwin(state_win,  10,       COLS-27,  2,24);
         reinitwin(valves_win, LINES-4,  20,       2,3);
         break;
-      case 's':
-        machine.changeState(SAFE); break;
-      case 'a'-96:
-        machine.changeState(ARMED); break;
-      // TODO FOR DEBUG
-      case ' ': 
-        machine.changeState(STARTUP); 
-        state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(1000); 
-        break;
-      case KEY_BACKSPACE:
-        machine.changeState(ABORT);
-        state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(1500); 
-        break;
-      case 'o':
-        machine.changeState(OFF);
+      default:
+        machine.update(ch);
     }
-
-    if (std::chrono::system_clock::now() > state_alarm) {
-      switch (machine.state) 
-      {
-        case STARTUP:
-          machine.changeState(FIRING);
-          state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(3000); 
-          break;
-        case FIRING:
-          machine.changeState(SHUTDOWN);
-          state_alarm = std::chrono::system_clock::now() + std::chrono::milliseconds(1000); 
-          break;
-        case SHUTDOWN:
-          machine.changeState(SAFE);
-          break;
-        case ABORT:
-          machine.changeState(ERROR);
-          break;
-        default:
-          break;
-      }
-    }
-     
+    machine.process();
+    
     draw_state(state_win,machine);
     // draw_colors();
     
-    mvhline_set(0, 0, &space, COLS); 
+    mvhline_set(0, 0, &space, COLS-10); 
 
     attron(COLOR_PAIR(3));
     mvprintw(0, 2, hint);
+    if (ch>=0) { mvhline_set(0, COLS-10, &space, 10); mvprintw(0, COLS-10, "%d", ch);}
+    mvprintw(0, COLS-20, "%.2f", fps);
+    std::this_thread::sleep_for(std::chrono::microseconds(stabilizer));
     attroff(A_COLOR);
   }
   endwin();  

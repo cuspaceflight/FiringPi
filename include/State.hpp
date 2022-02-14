@@ -1,7 +1,8 @@
 #pragma once
+#include <chrono>
 
 // values of states
-enum StateIndex {
+enum State {
   SAFE,
   ARMED,
   STARTUP,
@@ -16,10 +17,14 @@ enum StateIndex {
 class StateMachine
 {
 public:
-  StateIndex state;
+  State state;
+  std::chrono::time_point<std::chrono::system_clock> state_begin;  
+
   StateMachine();
-  bool changeState(StateIndex next);
-  bool canChangeTo(StateIndex next);
+  bool changeState(State next);
+  bool canChangeTo(State next);
+  State update(int ch);
+  void process();
 
   static const char* names[NUM_STATES];
   static const int colors[NUM_STATES];
