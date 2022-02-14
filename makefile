@@ -15,11 +15,14 @@ else
 endif
 
 TARGET := main
-OBJDIR := obj
-SOURCES := $(wildcard src/*.c src/*.cpp)
-OBJECTS := $(patsubst src%,obj%, $(patsubst %.c,%.o, $(patsubst %.cpp,%.o,$(SOURCES))))
+BUILD := build
+SRCDIR := src
+INCDIR := include
 
-INCLUDE := -I. -I./inc
+SOURCES := $(wildcard $(SRCDIR)/*.c $(SRCDIR)/*.cpp)
+OBJECTS := $(patsubst $(SRCDIR)%, $(BUILD)%, $(patsubst %.c,%.o, $(patsubst %.cpp,%.o,$(SOURCES))))
+
+INCLUDE := -I. -I./$(INCDIR)
 LIBPATH :=
 LIBS := -lncursesw
 
@@ -44,8 +47,8 @@ $(TARGET): $(OBJECTS)
 .PHONY: clean help
 
 clean:
-	$(call RM,$(OBJDIR))
-	$(call MAKEDIR,$(OBJDIR))
+	$(call RM,$(BUILD))
+	$(call MAKEDIR,$(BUILD))
 	$(call RM,$(TARGET))
 	
 help:
