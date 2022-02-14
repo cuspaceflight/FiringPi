@@ -1,4 +1,4 @@
-#include "mux.hpp"
+#include "Mux.hpp"
 
 Mux::Mux(std::vector<int> select_pins)
 {
