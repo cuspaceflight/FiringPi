@@ -142,7 +142,7 @@ int main()
     }
      
     draw_state(state_win,machine);
-    draw_colors();
+    // draw_colors();
     
     mvhline_set(0, 0, &space, COLS); 
 
