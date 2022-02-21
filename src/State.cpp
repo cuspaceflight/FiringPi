@@ -81,7 +81,6 @@ void StateMachine::process()
     case STARTUP:
     case FIRING:
     case SHUTDOWN:
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
       break;
     default:
       break;
