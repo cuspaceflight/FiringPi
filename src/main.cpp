@@ -107,7 +107,11 @@ int main()
   setcchar(&space, L" ", 0, 0, (void*)0);
 
   Server server{};
-
+  // server.manage_connections();
+  // char tmp[16];
+  // inet_ntop(AF_INET, &server.self.sin_addr, tmp, sizeof(tmp));
+  // printf("%d>> %s",server.sockfds[0].fd,tmp);
+  // return 0;
   while(!exit)
   {
     this_time = std::chrono::system_clock::now();

@@ -37,18 +37,19 @@ CXX := g++
 $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OBJECTS) -o $(TARGET) $(LIBPATH) $(LIBS)
 
-
-%.o: ../src/%.c
+$(BUILD)/%.o: $(SRCDIR)/%.c | $(BUILD)
 	$(CC) $(CCFLAGS) $(INCLUDE) -c $< -o $@
 
-%.o: ../src/%.cpp
+$(BUILD):
+	$(call MAKEDIR,$(BUILD))
+
+$(BUILD)/%.o: $(SRCDIR)/%.cpp | $(BUILD)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 	
 .PHONY: clean help
 
 clean:
 	$(call RM,$(BUILD))
-	$(call MAKEDIR,$(BUILD))
 	$(call RM,$(TARGET))
 	
 help:
