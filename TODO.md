@@ -18,7 +18,7 @@ This document is a place to lay out design decisions and problems that still nee
 
 ## TODO
 - ~~Run daemon on Pi~~
-- Rewrite remote link system (as above) [feat/socket](cuspaceflight/Cold-Flow-Test-Electronics/tree/feat/sockets/)
+- Rewrite remote link system (as above) [feat/socket](https://github.com/cuspaceflight/Cold-Flow-Test-Electronics/tree/feat/sockets/)
 - Write handler for I2C I/O
 - Write handler for HX711 read
 - Write handler for GPIO control of relay bank
