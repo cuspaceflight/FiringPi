@@ -33,6 +33,7 @@ CXXFLAGS := $(FLAGS) -std=c++2a
 CC := gcc
 CXX := g++
 
+all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OBJECTS) -o $(TARGET) $(LIBPATH) $(LIBS)

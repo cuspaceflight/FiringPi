@@ -1,6 +1,10 @@
 #include <cursesw.h>
 #include <iostream>
-#include <ncursesw/curses.h>
+#if __has_include(<ncursesw/curses.h>)
+    #include <ncursesw/curses.h>
+#else
+    #include <ncurses.h>
+#endif
 #include <locale.h>
 #include <chrono>
 #include <string>
