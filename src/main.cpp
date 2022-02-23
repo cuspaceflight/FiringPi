@@ -11,7 +11,6 @@
 #include <thread>
 
 #include "State.hpp"
-#include "Control.hpp"
 
 
 bool SOLENOID[3]{0};
@@ -70,17 +69,6 @@ void draw_colors()
   }
 }
 
-void draw_connections(Server server)
-{
-  char tmp[16];
-  inet_ntop(AF_INET, &server.self.sin_addr, tmp, sizeof(tmp));
-  mvprintw(14,30,tmp);
-
-  for (int i=0; i<=server.connected; i++)
-  {
-    mvprintw(15+server.sockfds[i].fd,30,"%d: %d",server.sockfds[i].fd,server.sockfds[i].revents);
-  }
-}
 
 int main()
 {
@@ -110,12 +98,6 @@ int main()
   cchar_t space {};
   setcchar(&space, L" ", 0, 0, (void*)0);
 
-  Server server{};
-  // server.manage_connections();
-  // char tmp[16];
-  // inet_ntop(AF_INET, &server.self.sin_addr, tmp, sizeof(tmp));
-  // printf("%d>> %s",server.sockfds[0].fd,tmp);
-  // return 0;
   while(!exit)
   {
     this_time = std::chrono::system_clock::now();
@@ -144,10 +126,8 @@ int main()
         machine.update(ch);
     }
     machine.process();
-    server.manage_connections();
     
     draw_state(state_win,machine);
-    draw_connections(server);
     // draw_colors();
     
     mvhline_set(0, 0, &space, COLS-10); 

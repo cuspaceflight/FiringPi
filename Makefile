@@ -28,7 +28,7 @@ LIBS := -lncursesw
 
 FLAGS := -Wall
 CCFLAGS := $(FLAGS) -std=c99
-CXXFLAGS := $(FLAGS) -std=c++20
+CXXFLAGS := $(FLAGS) -std=c++2a
 
 CC := gcc
 CXX := g++
