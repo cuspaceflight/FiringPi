@@ -1,12 +1,17 @@
 #include <cursesw.h>
 #include <iostream>
-#include <ncursesw/curses.h>
+#if __has_include(<ncursesw/curses.h>)
+    #include <ncursesw/curses.h>
+#else
+    #include <ncurses.h>
+#endif
 #include <locale.h>
 #include <chrono>
 #include <string>
 #include <thread>
 
 #include "State.hpp"
+#include "Control.hpp"
 
 
 bool SOLENOID[3]{0};
@@ -65,6 +70,18 @@ void draw_colors()
   }
 }
 
+void draw_connections(Server server)
+{
+  char tmp[16];
+  inet_ntop(AF_INET, &server.self.sin_addr, tmp, sizeof(tmp));
+  mvprintw(14,30,tmp);
+
+  for (int i=0; i<=server.connected; i++)
+  {
+    mvprintw(15+server.sockfds[i].fd,30,"%d: %d",server.sockfds[i].fd,server.sockfds[i].revents);
+  }
+}
+
 int main()
 {
   // systems stuff
@@ -93,6 +110,12 @@ int main()
   cchar_t space {};
   setcchar(&space, L" ", 0, 0, (void*)0);
 
+  Server server{};
+  // server.manage_connections();
+  // char tmp[16];
+  // inet_ntop(AF_INET, &server.self.sin_addr, tmp, sizeof(tmp));
+  // printf("%d>> %s",server.sockfds[0].fd,tmp);
+  // return 0;
   while(!exit)
   {
     this_time = std::chrono::system_clock::now();
@@ -100,7 +123,7 @@ int main()
     last_time = this_time;  
     fps=1000000.0/diff;
     stabilizer += 0.1*(16667-diff); 
-
+    
     ch = getch();
     switch (ch)
     {
@@ -121,21 +144,23 @@ int main()
         machine.update(ch);
     }
     machine.process();
+    server.manage_connections();
     
     draw_state(state_win,machine);
+    draw_connections(server);
     // draw_colors();
     
     mvhline_set(0, 0, &space, COLS-10); 
-
+    
     attron(COLOR_PAIR(3));
     mvprintw(0, 2, hint);
     if (ch>=0) { mvhline_set(0, COLS-10, &space, 10); mvprintw(0, COLS-10, "%d", ch);}
     mvprintw(0, COLS-20, "%.2f", fps);
     std::this_thread::sleep_for(std::chrono::microseconds(stabilizer));
     attroff(A_COLOR);
+    
+    
   }
   endwin();  
   return 0;
 }
-
-

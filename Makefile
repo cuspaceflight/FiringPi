@@ -8,7 +8,7 @@
 # - main
 ifeq ($(shell echo $$OS),$$OS)
     MAKEDIR = if not exist "$(1)" mkdir "$(1)"
-    RM = rmdir /S /Q "$(1)"
+    RM = if exist "$(1)" del /F /S /Q "$(1)"
 else
     MAKEDIR = '$(SHELL)' -c "mkdir -p \"$(1)\""
     RM = '$(SHELL)' -c "rm -rf \"$(1)\""
@@ -28,27 +28,29 @@ LIBS := -lncursesw
 
 FLAGS := -Wall
 CCFLAGS := $(FLAGS) -std=c99
-CXXFLAGS := $(FLAGS) -std=c++2a
+CXXFLAGS := $(FLAGS) -std=c++20
 
 CC := gcc
 CXX := g++
 
+all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OBJECTS) -o $(TARGET) $(LIBPATH) $(LIBS)
 
-
-%.o: ../src/%.c
+$(BUILD)/%.o: $(SRCDIR)/%.c | $(BUILD)
 	$(CC) $(CCFLAGS) $(INCLUDE) -c $< -o $@
 
-%.o: ../src/%.cpp
+$(BUILD):
+	$(call MAKEDIR,$(BUILD))
+
+$(BUILD)/%.o: $(SRCDIR)/%.cpp | $(BUILD)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 	
 .PHONY: clean help
 
 clean:
 	$(call RM,$(BUILD))
-	$(call MAKEDIR,$(BUILD))
 	$(call RM,$(TARGET))
 	
 help:
