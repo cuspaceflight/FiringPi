@@ -28,4 +28,3 @@ This document is a place to lay out design decisions and problems that still nee
 
 - Multiple remote connection support
 - GUI
-
