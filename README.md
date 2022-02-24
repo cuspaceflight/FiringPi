@@ -33,15 +33,21 @@ To quit the program, the system must first be in the OFF state, entered by press
 ```markdown
 cft-controller
 ├── build
-│   └── *.o
+│   ├── Display.o
+│   ├── main.o
+│   └── State.o
 ├── include
-│   └── *.hpp
-├── [main]
-├── makefile
+│   ├── Display.hpp
+│   └── State.hpp
+├── main
+├── Makefile
 ├── pi
 ├── README.md
-└── src
-    └── *.cpp
+├── src
+│   ├── Display.cpp
+│   ├── main.cpp
+│   └── State.cpp
+└── TODO.md
 ```
 
 ## Useful Stuff
