@@ -12,6 +12,7 @@
 
 #include "State.hpp"
 #include "Display.hpp"
+#include "Relay.hpp"
 
 
 bool SOLENOID[3]{0};
@@ -21,6 +22,7 @@ int main()
 {
   StateMachine machine;
   Display display{&machine};
+  Relay relays;
 
   bool exit {0};
   
