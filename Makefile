@@ -26,7 +26,7 @@ INCLUDE := -I. -I./$(INCDIR)
 LIBPATH :=
 LIBS := -lncursesw
 
-FLAGS := -Wall
+FLAGS := -Wall -g
 CCFLAGS := $(FLAGS) -std=c99
 CXXFLAGS := $(FLAGS) -std=c++2a
 

@@ -44,7 +44,6 @@ bool StateMachine::changeState(State next)
 {
   if (transition_matrix[state][next]) {
     state = next;
-    state_begin = std::chrono::system_clock::now();
     return true;
   }
   else {
@@ -67,7 +66,7 @@ State StateMachine::update(int ch)
     case 263:
       changeState(ABORT); break;
     case 'e':
-     changeState(ERROR); break;
+      changeState(ERROR); break;
     case 'o':
       changeState(OFF); break;
   }
