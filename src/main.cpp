@@ -19,14 +19,14 @@ bool SOLENOID[3]{0};
 
 int main()
 {
-  StateMachine machine {};
-  Display display {};
+  StateMachine machine;
+  Display display{&machine};
 
   bool exit {0};
   
   while(!exit)
   {
-    display.update(machine);
+    display.update();
     machine.process();
   }
   return 0;

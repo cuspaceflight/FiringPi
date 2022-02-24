@@ -16,18 +16,19 @@
 class Display
 {
 public:
-  Display();
-  void update(StateMachine machine);
+  Display(StateMachine* statemachine);
+  void update();
 
 private:
   int ch;
   std::string hint;
   cchar_t space;
   WINDOW *main_win, *state_win, *valves_win;
+  StateMachine* machine;
   std::chrono::time_point<std::chrono::system_clock> now, last;
 
   void reinitwin(WINDOW * win, int height, int width, int starty,int startx);
-  void draw_state(StateMachine machine);
+  void draw_state();
   void draw_colors();
 
 };

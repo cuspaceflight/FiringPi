@@ -1,9 +1,11 @@
 #include <Display.hpp>
 #include <chrono>
+#include <cstdlib>
 
 
-Display::Display()
+Display::Display(StateMachine* statemachine)
 {
+  machine = statemachine;
   setlocale(LC_ALL, "");
   initscr();
   start_color();
@@ -18,7 +20,6 @@ Display::Display()
   {
     init_pair(i, i, COLOR_BLACK);
   }
-
   main_win = newwin(0,0,1,1);
   state_win = newwin(0,0,2,24);
   valves_win = newwin(0,0,2,3);
@@ -32,7 +33,7 @@ Display::Display()
 
 }
 
-void Display::update(StateMachine machine)
+void Display::update()
 {
   now = std::chrono::system_clock::now();
   int diff = std::chrono::duration_cast<std::chrono::microseconds>(now-last).count();
@@ -45,7 +46,7 @@ void Display::update(StateMachine machine)
   {
     case -1: break;
     case 'q':
-      if (machine.state==OFF) { endwin(); exit(0); }
+      if (machine->state==OFF) { endwin(); exit(0); }
       hint = "MUST BE POWERED OFF TO EXIT: ENTER s[afe] STATE THEN PRESS o[ff], q[uit]";
       break;
     case KEY_RESIZE:
@@ -57,9 +58,10 @@ void Display::update(StateMachine machine)
       reinitwin(valves_win, LINES-4,  20,       2,3);
       break;
     default:
-      machine.update(ch);
+      machine->update(ch);
+      break;
   }
-  draw_state(machine);
+  draw_state();
   // draw_colors();
   
   mvhline_set(0, 0, &space, COLS-10); 
@@ -80,18 +82,18 @@ void Display::reinitwin(WINDOW * win, int height, int width, int starty,int star
   wrefresh(win);
 }
 
-void Display::draw_state(StateMachine machine)
+void Display::draw_state()
 {
-  int color = machine.colors[machine.state];
+  int color = machine->colors[machine->state];
   attron(COLOR_PAIR(color)|A_REVERSE);
   mvprintw(3,5,"                ");
   mvprintw(4,5," CURRENT STATE  ");
   mvprintw(5,5,"                ");
   attroff(COLOR_PAIR(color)|A_REVERSE);
-  for (int i=0; auto state_name: machine.names) 
+  for (int i=0; auto state_name: machine->names) 
   {
-    if (machine.state==i) { attron(A_REVERSE); }  
-    else if (!machine.canChangeTo((State)i)) { attron(A_DIM); }
+    if (machine->state==i) { attron(A_REVERSE); }  
+    else if (!machine->canChangeTo((State)i)) { attron(A_DIM); }
     mvprintw(2*i+7, 7, state_name);
     i++;
     attroff(A_REVERSE|A_DIM);
