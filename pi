@@ -9,16 +9,15 @@ function usage {
 
 
 if [ -z "$1" ] 
-  then
+then
     rsync -Cavuz include src cusf@cusfpi:cft-controller/ &&
-      ssh -tt cusf@cusfpi "make -C cft-controller && tmux -2 new -d ./cft-controller/main \; attach"
-  else
-while getopts brg arg; do
-  case $arg in
-    b) rsync -Cavuz include src cusf@cusfpi:cft-controller/ && ssh -tt cusf@cusfpi "make -C cft-controller" ;;
-    r) ssh -tt cusf@cusfpi "tmux -2 new -d ./cft-controller/main \; attach" ;;
-    ?) usage;;
-  esac
-done
-
+    ssh -tt cusf@cusfpi "make -C cft-controller && tmux -2 new -d ./cft-controller/main \; attach"
+else
+  while getopts brg arg; do
+    case $arg in
+      b) rsync -Cavuz include src cusf@cusfpi:cft-controller/ && ssh -tt cusf@cusfpi "make -C cft-controller" ;;
+      r) ssh -tt cusf@cusfpi "tmux -2 new -d ./cft-controller/main \; attach" ;;
+      ?) usage;;
+    esac
+  done
 fi

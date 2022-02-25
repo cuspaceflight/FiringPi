@@ -3,12 +3,12 @@
 #include <thread>
 
 // names of states
-const char* StateMachine::names[] { 
+const char* StateMachine::names [] { 
   "SAFE", "ARMED", "STARTUP", "FIRING", "SHUTDOWN", "ABORT", "ERROR", "OFF" 
 };
 
 // ncurses colors of states
-const int StateMachine::colors[] {
+const int StateMachine::colors [] {
   10, 11, 12, 12, 12, 9, 9, 0 
 };
 
@@ -16,7 +16,7 @@ const int StateMachine::colors[] {
 const bool StateMachine::transition_matrix [NUM_STATES][NUM_STATES] {
 // SAFE   ARMED   STARTUP FIRING SHUTDOWN ABORT   ERROR   OFF
   {true,  true,   false,  false,  false,  false,  true,   true},  //SAFE
-  {true,  true,   true,   false,  false,  false,  true,   false},  //ARMED
+  {true,  true,   true,   false,  false,  false,  true,   false}, //ARMED
   {false, false,  true,   true,   false,  true,   false,  false}, //STARTUP
   {false, false,  false,  true,   true,   true,   false,  false}, //FIRING
   {true,  false,  false,  false,  true,   true,   true,   false}, //SHUTDOWN
@@ -24,6 +24,17 @@ const bool StateMachine::transition_matrix [NUM_STATES][NUM_STATES] {
   {true,  false,  false,  false,  false,  false,  true,   true},  //ERROR
   {true,  false,  false,  false,  false,  false,  false,  true}   //OFF
 };  
+
+const int StateMachine::valve_matrix [NUM_STATES][NUM_RELAYS] {
+  {0, 0, 0, 0},
+  {0, 0, 0, 1},
+  {0, 0, 1, 0},
+  {0, 0, 1, 1},
+  {0, 1, 0, 0},
+  {0, 1, 0, 1},
+  {0, 1, 1, 0},
+  {0, 1, 1, 1}
+};
 
 StateMachine::StateMachine(Relay* relays)
 {
@@ -76,24 +87,25 @@ State StateMachine::update(int ch)
 
 void StateMachine::process()
 {
+  relays->set_outputs((int *)valve_matrix[state]);
   switch (state)
   {
     case SAFE:
-      relays->set_outputs(new int[NUM_RELAYS] {1,0,0,0}); break;
+      break;
     case ARMED:
-      relays->set_outputs(new int[NUM_RELAYS] {1,1,0,0}); break;
+      break;
     case STARTUP:
-      relays->set_outputs(new int[NUM_RELAYS] {1,1,0,0}); break;
+      break;
     case FIRING:
-      relays->set_outputs(new int[NUM_RELAYS] {1,1,1,0}); break;
+      break;
     case SHUTDOWN:
-      relays->set_outputs(new int[NUM_RELAYS] {0,1,1,0}); break;
+      break;
     case ABORT:
-      relays->set_outputs(new int[NUM_RELAYS] {1,1,1,1}); break;
+      break;
     case ERROR:
-      relays->set_outputs(new int[NUM_RELAYS] {0,0,0,1}); break;
+      break;
     case OFF:
-      relays->set_outputs(new int[NUM_RELAYS] {0,0,0,0}); break;
+      break;
     case NUM_STATES:
       break;
   }

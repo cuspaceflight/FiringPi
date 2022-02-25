@@ -33,5 +33,6 @@ private:
   Relay* relays;
   std::chrono::time_point<std::chrono::system_clock> state_begin;  
   static const bool transition_matrix[NUM_STATES][NUM_STATES];
+  static const int valve_matrix[NUM_STATES][NUM_RELAYS];
 
 };
