@@ -3,9 +3,10 @@
 #include <cstdlib>
 
 
-Display::Display(StateMachine* statemachine)
+Display::Display(StateMachine* machine, Relay* relays)
 {
-  machine = statemachine;
+  this->machine = machine;
+  this->relays = relays;
   setlocale(LC_ALL, "");
   initscr();
   start_color();
@@ -38,7 +39,7 @@ void Display::update()
   now = std::chrono::system_clock::now();
   int diff = std::chrono::duration_cast<std::chrono::microseconds>(now-last).count();
   if (diff<16667) { return; }
-  last = now;
+  last = std::chrono::system_clock::now();
 
   ch = getch();
 
@@ -69,7 +70,7 @@ void Display::update()
   attron(COLOR_PAIR(3));
   mvprintw(0, 2, hint.c_str());
   if (ch>=0) { mvhline_set(0, COLS-10, &space, 10); mvprintw(0, COLS-10, "%d", ch);}
-  mvprintw(0, COLS-20, "%.2f", 1000000/diff);
+  mvprintw(0, COLS-25, "%.1f", 1000000.0f/diff);
   attroff(A_COLOR);
 }
 

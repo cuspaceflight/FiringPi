@@ -25,9 +25,10 @@ const bool StateMachine::transition_matrix [NUM_STATES][NUM_STATES] {
   {true,  false,  false,  false,  false,  false,  false,  true}   //OFF
 };  
 
-StateMachine::StateMachine()
+StateMachine::StateMachine(Relay* relays)
 {
   state = OFF;
+  this->relays = relays;
 }
 
 bool StateMachine::canChangeTo(State next)
@@ -77,11 +78,23 @@ void StateMachine::process()
 {
   switch (state)
   {
+    case SAFE:
+      relays->set_outputs(new int[NUM_RELAYS] {1,0,0,0}); break;
+    case ARMED:
+      relays->set_outputs(new int[NUM_RELAYS] {1,1,0,0}); break;
     case STARTUP:
+      relays->set_outputs(new int[NUM_RELAYS] {1,1,0,0}); break;
     case FIRING:
+      relays->set_outputs(new int[NUM_RELAYS] {1,1,1,0}); break;
     case SHUTDOWN:
-      break;
-    default:
+      relays->set_outputs(new int[NUM_RELAYS] {0,1,1,0}); break;
+    case ABORT:
+      relays->set_outputs(new int[NUM_RELAYS] {1,1,1,1}); break;
+    case ERROR:
+      relays->set_outputs(new int[NUM_RELAYS] {0,0,0,1}); break;
+    case OFF:
+      relays->set_outputs(new int[NUM_RELAYS] {0,0,0,0}); break;
+    case NUM_STATES:
       break;
   }
 }

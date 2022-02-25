@@ -11,12 +11,13 @@
 #include<chrono>
 
 #include "State.hpp"
+#include "Relay.hpp"
 
 
 class Display
 {
 public:
-  Display(StateMachine* statemachine);
+  Display(StateMachine* statemachine, Relay* relays);
   void update();
 
 private:
@@ -25,6 +26,7 @@ private:
   cchar_t space;
   WINDOW *main_win, *state_win, *valves_win;
   StateMachine* machine;
+  Relay* relays;
   std::chrono::time_point<std::chrono::system_clock> now, last;
 
   void reinitwin(WINDOW * win, int height, int width, int starty,int startx);

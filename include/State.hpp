@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include "Relay.hpp"
+
 // values of states
 enum State {
   SAFE,
@@ -19,16 +21,17 @@ class StateMachine
 {
 public:
   State state;
-  std::chrono::time_point<std::chrono::system_clock> state_begin;  
+  static const char* names[NUM_STATES];
+  static const int colors[NUM_STATES];
 
-  StateMachine();
+  StateMachine(Relay* relays);
   bool changeState(State next);
   bool canChangeTo(State next);
   State update(int ch);
   void process();
-
-  static const char* names[NUM_STATES];
-  static const int colors[NUM_STATES];
+private:
+  Relay* relays;
+  std::chrono::time_point<std::chrono::system_clock> state_begin;  
   static const bool transition_matrix[NUM_STATES][NUM_STATES];
 
 };

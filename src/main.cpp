@@ -8,7 +8,6 @@
 #include <locale.h>
 #include <chrono>
 #include <string>
-#include <thread>
 
 #include "State.hpp"
 #include "Display.hpp"
@@ -17,12 +16,11 @@
 
 bool SOLENOID[3]{0};
 
-
 int main()
 {
-  StateMachine machine;
-  Display display{&machine};
   Relay relays;
+  StateMachine machine{&relays};
+  Display display{&machine,&relays};
 
   bool exit {0};
   
