@@ -1,4 +1,4 @@
-# Cold-Flow-Test-Electronics
+# FiringPi
 This project is designed to be run on a Raspberry Pi connected to various peripherals, to act as both fire controller and datalogger for CUSF's White Dwarf hot and cold test fires.
 The utility files only run on linux, but you should be able to work out equivalent commands for windows if you need to (if you do this please do put them in a .bat file and pull request.).
 
