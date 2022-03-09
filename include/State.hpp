@@ -24,13 +24,13 @@ public:
   static const char* names[NUM_STATES];
   static const int colors[NUM_STATES];
 
-  StateMachine(Relay* relays);
+  StateMachine(Relay* valves);
   bool changeState(State next);
   bool canChangeTo(State next);
   State update(int ch);
   void process();
 private:
-  Relay* relays;
+  Relay* valves;
   std::chrono::time_point<std::chrono::system_clock> state_begin;  
   static const bool transition_matrix[NUM_STATES][NUM_STATES];
   static const int valve_matrix[NUM_STATES][NUM_RELAYS];

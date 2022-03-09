@@ -9,9 +9,9 @@
 class Relay
 {
 public:
-  Relay();
-  void set_output(int output, int value);
-  void set_outputs(int values[NUM_RELAYS]);
+    Relay();
+    static void set_output(int output, int value);
+    static void set_outputs(int values[NUM_RELAYS]);
 private:
-  static const int pins[NUM_RELAYS];
+    static const int pins[NUM_RELAYS];
 };

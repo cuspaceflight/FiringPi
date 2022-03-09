@@ -26,20 +26,20 @@ const bool StateMachine::transition_matrix [NUM_STATES][NUM_STATES] {
 };  
 
 const int StateMachine::valve_matrix [NUM_STATES][NUM_RELAYS] {
-  {0, 0, 0, 0},
+  {1, 1, 1, 1},
   {0, 0, 0, 1},
   {0, 0, 1, 0},
   {0, 0, 1, 1},
   {0, 1, 0, 0},
   {0, 1, 0, 1},
-  {0, 1, 1, 0},
-  {0, 1, 1, 1}
+  {1, 1, 1, 0},
+  {0, 0, 0, 0}
 };
 
-StateMachine::StateMachine(Relay* relays)
+StateMachine::StateMachine(Relay* valves)
 {
   state = OFF;
-  this->relays = relays;
+  this->valves = valves;
 }
 
 bool StateMachine::canChangeTo(State next)
@@ -87,7 +87,7 @@ State StateMachine::update(int ch)
 
 void StateMachine::process()
 {
-  relays->set_outputs((int *)valve_matrix[state]);
+  valves->set_outputs((int *)valve_matrix[state]);
   switch (state)
   {
     case SAFE:
