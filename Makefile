@@ -46,7 +46,7 @@ $(BUILD):
 
 $(BUILD)/%.o: $(SRCDIR)/%.cpp | $(BUILD)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
-	
+
 .PHONY: clean help
 
 clean:

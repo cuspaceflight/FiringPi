@@ -13,9 +13,6 @@
 #include "Display.hpp"
 #include "Relay.hpp"
 
-
-bool SOLENOID[3]{0};
-
 int main()
 {
   Relay relays;
