@@ -1,10 +1,8 @@
 #include "Relay.hpp"
-#include <wiringPi.h>
 
-const int Relay::pins[NUM_RELAYS] = {23,24,12,25};
+const int Relay::pins[NUM_RELAYS] = {23, 24, 12, 25};
 
-Relay::Relay()
-{
+Relay::Relay() {
     // no need to check error code of wiringPiSetup()
     // as it always returns zero and will crash on failure
     wiringPiSetupGpio();
@@ -14,15 +12,12 @@ Relay::Relay()
     };
 }
 
-void Relay::set_output(int output, int value)
-{
+void Relay::set_output(int output, int value) {
     digitalWrite(pins[output], value);
 }
 
-void Relay::set_outputs(int *values)
-{
-    for (int i; i<NUM_RELAYS; i++)
-    {
+void Relay::set_outputs(int *values) {
+    for (int i; i < NUM_RELAYS; i++) {
         digitalWrite(pins[i], values[i]);
     }
 }
