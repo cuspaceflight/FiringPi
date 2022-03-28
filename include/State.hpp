@@ -27,11 +27,11 @@ public:
 
     bool changeState(State next);
 
-    bool canChangeTo(State next);
+    bool canChangeTo(State next) const;
 
     State update(int ch);
 
-    void process();
+    void process() const;
 
 private:
     Relay *valves;

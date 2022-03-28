@@ -9,7 +9,7 @@ Relay::Relay() {
     for (int pin: pins) {
         pinMode(pin, OUTPUT);
         digitalWrite(pin, 0);
-    };
+    }
 }
 
 void Relay::set_output(int output, int value) {

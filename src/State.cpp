@@ -1,6 +1,4 @@
 #include "State.hpp"
-#include <chrono>
-#include <thread>
 
 // names of states
 const char *StateMachine::names[]{
@@ -41,7 +39,7 @@ StateMachine::StateMachine(Relay *valves) {
     this->valves = valves;
 }
 
-bool StateMachine::canChangeTo(State next) {
+bool StateMachine::canChangeTo(State next) const {
     if (transition_matrix[state][next]) {
         return true;
     } else {
@@ -80,12 +78,14 @@ State StateMachine::update(int ch) {
         case 'o':
             changeState(OFF);
             break;
+        default:
+            break;
     }
     return state;
 }
 
-void StateMachine::process() {
-    valves->set_outputs((int *) valve_matrix[state]);
+void StateMachine::process() const {
+    Relay::set_outputs((int *) valve_matrix[state]);
     switch (state) {
         case SAFE:
             break;

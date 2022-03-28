@@ -2,17 +2,10 @@
 
 #include <cursesw.h>
 #include <iostream>
-
-#if __has_include(<ncursesw/curses.h>)
-#include <ncursesw/curses.h>
-#else
-
-#include <ncurses.h>
-
-#endif
-
-#include <string.h>
-#include<chrono>
+//#include <ncursesw/curses.h>
+#include <string>
+#include <chrono>
+#include <vector>
 
 #include "State.hpp"
 #include "Relay.hpp"
@@ -21,7 +14,7 @@
 
 class Display {
 public:
-    Display(StateMachine *statemachine, Relay *relays, PT *pt);
+    Display(StateMachine *statemachine, Relay *relays, std::vector<PT*> *pts);
 
     void update();
     bool open;
@@ -33,10 +26,10 @@ private:
     WINDOW *main_win, *state_win, *valves_win;
     StateMachine *machine;
     Relay *relays;
-    PT *pt;
+    std::vector<PT*> *pts;
     std::chrono::time_point<std::chrono::system_clock> now, last;
 
-    void reinitwin(WINDOW *win, int height, int width, int starty, int startx);
+    static void reinitwin(WINDOW *win, int height, int width, int starty, int startx);
 
     void draw_state();
 

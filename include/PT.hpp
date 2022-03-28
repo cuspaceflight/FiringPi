@@ -10,6 +10,8 @@ extern "C" {
 #include <fcntl.h>
 #include <cstdlib>
 #include <sys/ioctl.h>
+#include <thread>
+#include <chrono>
 
 #define PMAX 350
 #define PMIN 0
@@ -20,13 +22,17 @@ class PT {
     float _pressure, _temperature;
 
 public:
-    PT(int bus, int addr);
+    PT(int bus, int addr, int frequency);
 
     int recv();
 
     int file, addr, frequency;
 
-    decltype(_pressure) pressure() const { return _pressure; }
-    decltype(_temperature) temperature() const { return _temperature; }
+    float pressure() const { return _pressure; }
+    float temperature() const { return _temperature; }
+
+    void loop();
+    std::thread* thread_obj;
+    bool is_alive;
 
 };
