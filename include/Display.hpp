@@ -16,11 +16,12 @@
 
 #include "State.hpp"
 #include "Relay.hpp"
+#include "PT.hpp"
 
 
 class Display {
 public:
-    Display(StateMachine *statemachine, Relay *relays);
+    Display(StateMachine *statemachine, Relay *relays, PT *pt);
 
     void update();
     bool open;
@@ -32,12 +33,13 @@ private:
     WINDOW *main_win, *state_win, *valves_win;
     StateMachine *machine;
     Relay *relays;
+    PT *pt;
     std::chrono::time_point<std::chrono::system_clock> now, last;
 
     void reinitwin(WINDOW *win, int height, int width, int starty, int startx);
 
     void draw_state();
 
-    void draw_colors();
+    void draw_gauges();
 
 };

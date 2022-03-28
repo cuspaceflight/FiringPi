@@ -17,7 +17,7 @@ void Relay::set_output(int output, int value) {
 }
 
 void Relay::set_outputs(int *values) {
-    for (int i; i < NUM_RELAYS; i++) {
+    for (int i = 0; i < NUM_RELAYS; i++) {
         digitalWrite(pins[i], values[i]);
     }
 }

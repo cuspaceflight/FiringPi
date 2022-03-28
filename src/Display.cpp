@@ -3,9 +3,10 @@
 #include <cstdlib>
 
 
-Display::Display(StateMachine *machine, Relay *relays) {
+Display::Display(StateMachine *machine, Relay *relays, PT *pt) {
     this->machine = machine;
     this->relays = relays;
+    this->pt = pt;
     this->open=true;
     setlocale(LC_ALL, "");
     initscr();
@@ -64,6 +65,7 @@ void Display::update() {
             break;
     }
     draw_state();
+    draw_gauges();
     // draw_colors();
 
     mvhline_set(0, 0, &space, COLS - 10);
@@ -102,10 +104,8 @@ void Display::draw_state() {
     };
 }
 
-void Display::draw_colors() {
-    for (int i = 0; i < COLORS; i++) {
-        attron(COLOR_PAIR(i));
-        mvprintw(15 + (i % 12), 30 + 4 * (i / 12), "%d", i);
-        attroff(COLOR_PAIR(i));
-    }
+void Display::draw_gauges() {
+    pt->recv();
+    mvprintw(6,30,"P: %f",pt->pressure());
+    mvprintw(7,30,"T: %f",pt->temperature());
 }

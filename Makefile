@@ -24,9 +24,9 @@ OBJECTS := $(patsubst $(SRCDIR)%, $(BUILD)%, $(patsubst %.c,%.o, $(patsubst %.cp
 
 INCLUDE := -I. -I./$(INCDIR)
 LIBPATH :=
-LIBS := -lncursesw -lwiringPi
+LIBS := -lncursesw -lwiringPi -li2c
 
-FLAGS := -Wall -g
+FLAGS := -Wall -g -otest
 CCFLAGS := $(FLAGS) -std=c99
 CXXFLAGS := $(FLAGS) -std=c++2a
 

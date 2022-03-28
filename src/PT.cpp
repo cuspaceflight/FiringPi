@@ -17,3 +17,14 @@ PT::PT(int bus, int addr) {
     }
 
 }
+
+int PT::recv() {
+    char buf[4];
+    if (read(file, buf, 4) < 0) { return -1; }
+
+    _pressure = (PMAX - PMIN) / 14000.0f * (float)(((buf[0] << 8) | buf[1]) - 1000) + PMIN;
+    _temperature = (200 / 2048.0f) * (float)((buf[2] << 3) | (buf[3] >> 5)) - 50.0f;
+
+    read(file, buf, 0);
+    return 0;
+}
