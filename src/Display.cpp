@@ -42,6 +42,7 @@ void Display::update() {
     last = std::chrono::system_clock::now();
 
     ch = getch();
+
     switch (ch) {
         case -1:
             break;
@@ -63,7 +64,7 @@ void Display::update() {
             reinitwin(main_win, LINES - 2, COLS - 2, 1, 1);
             reinitwin(top_win, 10, COLS - 27, 2, 24);
             reinitwin(left_win, LINES - 4, 20, 2, 3);
-            reinitwin(graph_win, (LINES - 14) / 2, (COLS - 27) / 2, 12, 24);
+            reinitwin(graph_win, (LINES - 14)/2, (COLS - 27)/2, 12, 24);
             break;
         default:
             machine->update(ch);
@@ -120,7 +121,7 @@ void Display::draw_gauges() {
 void Display::draw_graphs() {
 
     graph_buffer.push_back((*pts)[0]->pressure());
-    while (graph_buffer.size() > 2 * (getmaxx(graph_win) - 1)) { graph_buffer.pop_front(); }
+    while (graph_buffer.size()>2*(getmaxx(graph_win)-1)) { graph_buffer.pop_front(); }
 
     int lookup_l[]{0x40, 0x4, 0x2, 0x1};
     int lookup_r[]{0x80, 0x20, 0x10, 0x8};
@@ -133,22 +134,22 @@ void Display::draw_graphs() {
 
     werase(graph_win);
     for (int i = 0; i < graph_buffer.size(); i += 2) {
-        pr = 1 + graph_buffer[i];
-        pl = 1 + graph_buffer[i + 1];
+        pr = 1+graph_buffer[i];
+        pl = 1+graph_buffer[i + 1];
         l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
         r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
-        if (std::fmod(pl, 1 / scale) == std::fmod(pr, 1 / scale)) {
+        if (std::fmod(pl,1/scale)==std::fmod(pr,1/scale)) {
             *(c->chars) = 0x2800 + l + r;
-            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pl - 1)), 2 + i / 2, c);
+            mvwadd_wch(graph_win, 7-(int) std::floor(scale * (pl-1)), 2 + i / 2, c);
         } else {
             *(c->chars) = 0x2800 + l;
-            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pl - 1)), 2 + i / 2, c);
+            mvwadd_wch(graph_win, 7-(int) std::floor(scale * (pl-1)), 2 + i / 2, c);
             *(c->chars) = 0x2800 + r;
-            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pr - 1)), 2 + i / 2, c);
+            mvwadd_wch(graph_win, 7-(int) std::floor(scale * (pr-1)), 2 + i / 2, c);
         }
 
     }
-    box(graph_win, 0, 0);
+    box(graph_win,0,0);
     wrefresh(graph_win);
 
 }
