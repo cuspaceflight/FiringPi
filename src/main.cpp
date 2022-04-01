@@ -7,8 +7,7 @@
 
 int main() {
     std::vector<PT*> pts{
-        new PT(1,0x28,7),
-        new PT(1,0x28,13)
+        new PT(1,0x28,200)
     };
 
     Relay relays;
