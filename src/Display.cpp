@@ -113,15 +113,19 @@ void Display::draw_state() {
 }
 
 void Display::draw_gauges() {
-    mvwprintw(top_win, 4, 4, "P: %f", (*pts)[0]->pressure());
-    mvwprintw(top_win, 5, 4, "T: %f", (*pts)[0]->temperature());
+    mvwprintw(top_win, 2, 4, "P0: %f", (*pts)[0]->pressure);
+    mvwprintw(top_win, 3, 4, "T0: %f", (*pts)[0]->temperature);
+
+    mvwprintw(top_win, 5, 4, "P1: %f", (*pts)[1]->pressure);
+    mvwprintw(top_win, 6, 4, "T1: %f", (*pts)[1]->temperature);
+
     wrefresh(top_win);
 }
 
 void Display::draw_graphs() {
 
-    graph_buffer.push_back((*pts)[0]->pressure());
-    while (graph_buffer.size()>2*(getmaxx(graph_win)-1)) { graph_buffer.pop_front(); }
+    graph_buffer.push_back((*pts)[0]->pressure);
+    while ((int)graph_buffer.size()>2*(getmaxx(graph_win)-1)) { graph_buffer.pop_front(); }
 
     int lookup_l[]{0x40, 0x4, 0x2, 0x1};
     int lookup_r[]{0x80, 0x20, 0x10, 0x8};
@@ -133,7 +137,7 @@ void Display::draw_graphs() {
 
 
     werase(graph_win);
-    for (int i = 0; i < graph_buffer.size(); i += 2) {
+    for (int i = 0; i < (int)graph_buffer.size(); i += 2) {
         pr = 1+graph_buffer[i];
         pl = 1+graph_buffer[i + 1];
         l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
