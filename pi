@@ -4,7 +4,7 @@ function usage {
   echo "Usage: $(basename $0) [-br]" 2>&1
   echo "          default:  build and run on the Pi"
   echo "    -b    build:    just compile on the Pi"
-  echo "    - run the existing binary in the Pi"
+  echo "    -r    run:      run the existing binary in the Pi"
 }
 
 
