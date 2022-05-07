@@ -3,11 +3,12 @@
 #include <cstdlib>
 
 
-Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts) {
+Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts, std::shared_ptr<LoadCell> load_cell) {
     this->machine = machine;
     this->relays = relays;
     this->pts = pts;
     this->open = true;
+    this->load_cell = load_cell;
     setlocale(LC_ALL, "");
     initscr();
     start_color();
@@ -52,6 +53,7 @@ void Display::update() {
                     pt->is_alive = false;
                     pt->thread_obj->join();
                 }
+                load_cell->kill();
                 endwin();
                 exit(0);
             }
@@ -118,6 +120,8 @@ void Display::draw_gauges() {
 
     mvwprintw(top_win, 5, 4, "P1: %f", (*pts)[1]->pressure);
     mvwprintw(top_win, 6, 4, "T1: %f", (*pts)[1]->temperature);
+
+    mvwprintw(top_win, 8, 4, "LC1: %f",load_cell->get_weight());
 
     wrefresh(top_win);
 }
