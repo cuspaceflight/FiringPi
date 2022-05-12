@@ -22,9 +22,10 @@ INCDIR := include
 SOURCES := $(wildcard $(SRCDIR)/*.c $(SRCDIR)/*.cpp)
 OBJECTS := $(patsubst $(SRCDIR)%, $(BUILD)%, $(patsubst %.c,%.o, $(patsubst %.cpp,%.o,$(SOURCES))))
 
-INCLUDE := -I. -I./$(INCDIR)
+HEADERPATH := /usr/include/hdf5/serial
+INCLUDE := -I. -I./$(INCDIR) -I$(HEADERPATH)
 LIBPATH :=
-LIBS := -lncursesw -lwiringPi -li2c -lpthread
+LIBS := -lncursesw -lwiringPi -li2c -lpthread -lhdf5
 
 FLAGS := -Wall -g -otest
 CCFLAGS := $(FLAGS) -std=c99

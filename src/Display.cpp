@@ -3,10 +3,11 @@
 #include <cstdlib>
 
 
-Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts) {
+Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts, Logger *logger) {
     this->machine = machine;
     this->relays = relays;
     this->pts = pts;
+    this->logger = logger;
     this->open = true;
     setlocale(LC_ALL, "");
     initscr();
@@ -48,6 +49,8 @@ void Display::update() {
             break;
         case 'q':
             if (machine->state == OFF) {
+                logger->logging = false;
+                logger->thread_obj->join();
                 for (auto *pt: *pts) {
                     pt->is_alive = false;
                     pt->thread_obj->join();
