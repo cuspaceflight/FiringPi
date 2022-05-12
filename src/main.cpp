@@ -23,6 +23,5 @@ int main() {
     while (display.open) {
         display.update();
         machine.process();
-        logger.log();
     }
 }

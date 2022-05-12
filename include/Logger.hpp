@@ -4,6 +4,7 @@
 #include <thread>
 #include <chrono>
 #include <glob.h>
+#include <vector>
 
 #include "State.hpp"
 #include "Relay.hpp"
@@ -28,8 +29,9 @@ private:
     hid_t fid;   /* HDF5 identifier for file */
     hid_t ptable;  // HDF5 identifier for packet table
     hsize_t count;  /* Number of records in table */
-    hid_t timetable;
-    std::vector<hid_t*> PTtables;
+    FL_PacketTable *timetable;
+    FL_PacketTable *PTtables;
+    //::vector<hid_t*> PTtables;
     
 
     void loop();
@@ -38,7 +40,7 @@ private:
 
 
 public:
-    Logger(StateMachine *machine, Relay *relays, std::vector<PT *> *pts);
+    Logger(StateMachine *machine, Relay *relays, std::vector<PT*> *pts);
     bool logging;
     std::thread* thread_obj;
 };
