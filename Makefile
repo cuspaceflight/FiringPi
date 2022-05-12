@@ -25,7 +25,7 @@ OBJECTS := $(patsubst $(SRCDIR)%, $(BUILD)%, $(patsubst %.c,%.o, $(patsubst %.cp
 HEADERPATH := /usr/lib/aarch64-linux-gnu/hdf5/serial/include
 INCLUDE := -I. -I./$(INCDIR) -I$(HEADERPATH)
 LIBPATH := -L /usr/lib/aarch64-linux-gnu/hdf5/serial
-LIBS := -lncursesw -lwiringPi -li2c -lpthread -lhdf5 -lhdf5_cpp -lhdf5_hl
+LIBS := -lncursesw -lwiringPi -li2c -lpthread -lhdf5_hl_cpp
 
 FLAGS := -Wall -g -otest
 CCFLAGS := $(FLAGS) -std=c99

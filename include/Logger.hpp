@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fstream>
 #include <thread>
 #include <chrono>
 #include <glob.h>
@@ -10,6 +9,10 @@
 #include "Relay.hpp"
 #include "PT.hpp"
 #include <H5PacketTable.h>
+#include <iostream>
+#include <stdio.h>
+#include <fstream>
+#include "defines.hpp"
 
 
 #define LOGGING_FREQ 200
@@ -31,6 +34,7 @@ private:
     hsize_t count;  /* Number of records in table */
     FL_PacketTable *timetable;
     FL_PacketTable *PTtables;
+    std::ofstream log_csv;
     //::vector<hid_t*> PTtables;
     
 

@@ -5,9 +5,8 @@
 #include "Relay.hpp"
 #include "PT.hpp"
 #include "Logger.hpp"
-
-#define SAMPLING_FREQ 200   // Sammpling frequency, Hz
-#define PT1_ADDR      0x28       // PT1 Address
+#include "defines.hpp"
+#include <fstream>
 
 int main() {
     std::vector<PT*> pts{
@@ -18,7 +17,6 @@ int main() {
     StateMachine machine{&relays};
     Logger logger{&machine, &relays, &pts};
     Display display{&machine, &relays, &pts, &logger};
-    
 
     while (display.open) {
         display.update();
