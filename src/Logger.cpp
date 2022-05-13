@@ -49,8 +49,8 @@ void Logger::loop() {
     while(this->logging) {
         std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
         long diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->startime).count();
-        data[0] = (*pts)[0]->pressure();
-        data[1] = (*pts)[0]->temperature();
+        data[0] = (*pts)[0]->pressure;
+        data[1] = (*pts)[0]->temperature;
         err = this->timetable->AppendPacket(&diff);
         err = this->PTtables->AppendPacket( &(data[0]) );
         sprintf(line,"%05d, %f, %f\n",diff, data[0], data[1]);

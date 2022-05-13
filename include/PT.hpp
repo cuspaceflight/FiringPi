@@ -18,20 +18,16 @@ extern "C" {
 
 
 class PT {
-
-    float _pressure, _temperature;
-
 public:
+
+    float pressure, temperature;
+    int file, addr, frequency, status;
+
     PT(int bus, int addr, int frequency);
 
     int recv();
-
-    int file, addr, frequency;
-
-    float pressure() const { return _pressure; }
-    float temperature() const { return _temperature; }
-
     void loop();
+
     std::thread* thread_obj;
     bool is_alive;
 

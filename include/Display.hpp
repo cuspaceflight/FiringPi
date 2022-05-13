@@ -13,11 +13,12 @@
 #include "Relay.hpp"
 #include "PT.hpp"
 #include "Logger.hpp"
+#include "LoadCell.hpp"
 
 
 class Display {
 public:
-    Display(StateMachine *statemachine, Relay *relays, std::vector<PT*> *pts, Logger *logger);
+    Display(StateMachine *statemachine, Relay *relays, std::vector<PT*> *pts, std::shared_ptr<LoadCell> load_cell, Logger *logger);
 
     void update();
     bool open;
@@ -30,6 +31,7 @@ private:
     WINDOW *main_win, *top_win, *left_win, *graph_win;
     StateMachine *machine;
     Relay *relays;
+    std::shared_ptr<LoadCell> load_cell;
     std::vector<PT*> *pts;
     Logger *logger;
     std::chrono::time_point<std::chrono::system_clock> now, last;
