@@ -21,21 +21,21 @@ Logger::Logger(StateMachine *machine, Relay *relays, std::vector<PT*> *pts) {
     // Find run no
     glob_t gstruct;
     strftime(date, 14, "%d-%m-%Y", timeinfo);
-    sprintf(fname, "/home/cusf/FiringPi/test-data/%s_*", date);
+    sprintf(fname, "/home/cusf/FiringPi/test-data/%s_*.h5", date);
     glob(fname, GLOB_ERR, NULL, &gstruct);
     
     // Generate filename
-    sprintf(fname, "/home/cusf/FiringPi/test-data/%s_%02d.h5", date, (int)gstruct.gl_pathc/2+1);
+    sprintf(fname, "/home/cusf/FiringPi/test-data/%s_%02d.h5", date, (int)gstruct.gl_pathc+1);
     globfree(&gstruct);
     this->fid = H5Fcreate(fname, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
-    sprintf(fname, "/home/cusf/FiringPi/test-data/%s_%02d.csv", date, (int)gstruct.gl_pathc/2+1);
+    sprintf(fname, "/home/cusf/FiringPi/test-data/%s_%02d.csv", date, (int)gstruct.gl_pathc+1);
     
     // Open files and set up HDF5 packet tables
     this->log_csv.open(fname);
     (this->log_csv) << "T (ms), P1 , T1\n";
     this->timetable = new FL_PacketTable(this->fid, "/T", H5T_NATIVE_INT, 1, H5P_DEFAULT);
     sprintf(tname, "/PT_%d", 1);
-    this->PTtables = new FL_PacketTable(this->fid, "/PT_1", H5T_NATIVE_FLOAT, 1, H5P_DEFAULT);
+    this->PTtables = new FL_PacketTable(this->fid, "/P_1", H5T_NATIVE_FLOAT, 1, H5P_DEFAULT);
     
     this->startime = std::chrono::system_clock::now();
     this->thread_obj = new std::thread(&Logger::loop,this);
@@ -45,12 +45,15 @@ Logger::Logger(StateMachine *machine, Relay *relays, std::vector<PT*> *pts) {
 void Logger::loop() {
     herr_t err;
     char line[100];
+    float data[2];
     while(this->logging) {
         std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
         long diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->startime).count();
+        data[0] = (*pts)[0]->pressure();
+        data[1] = (*pts)[0]->temperature();
         err = this->timetable->AppendPacket(&diff);
-        sprintf(line,"%05d, %f, %f\n",diff, (*pts)[0]->pressure(), (*pts)[0]->temperature());
-        //(this->log_csv) << "End of file\n";
+        err = this->PTtables->AppendPacket( &(data[0]) );
+        sprintf(line,"%05d, %f, %f\n",diff, data[0], data[1]);
         (this->log_csv) << line;
         std::this_thread::sleep_for(std::chrono::microseconds((const int)1e6/SAMPLING_FREQ));
         
@@ -62,6 +65,7 @@ void Logger::loop() {
     (this->log_csv) << "End of file\n";
     this->log_csv.close();
     err = H5Fclose(this->fid);
-    if( err < 0 )
+    if( err < 0 ) {
         fprintf(stderr, "Failed to close file.\n");
+    }
 }
