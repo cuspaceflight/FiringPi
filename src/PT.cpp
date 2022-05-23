@@ -1,9 +1,6 @@
 #include "PT.hpp"
 
-PT::PT(int bus, int addr, int frequency) {
-    this->addr = addr;
-    this->frequency = frequency;
-    this->is_alive = true;
+PT::PT(int bus, int address, int frequency) : addr(address), freq(frequency), is_alive(true) {
 
     char filename[20];
 
@@ -51,6 +48,6 @@ int PT::recv() {
 void PT::loop() {
     while (this->is_alive) {
         this->recv();
-        std::this_thread::sleep_for(std::chrono::microseconds((const int) 1e6 / frequency));
+        std::this_thread::sleep_for(std::chrono::microseconds((const int) 1e6 / freq));
     }
 }
