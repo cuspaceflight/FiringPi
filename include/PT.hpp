@@ -21,9 +21,9 @@ class PT {
 public:
 
     float pressure, temperature;
-    int file, addr, frequency, status;
+    int file, addr, freq, status;
 
-    PT(int bus, int addr, int frequency);
+    PT(int bus, int address, int frequency);
 
     int recv();
     void loop();

@@ -1,14 +1,12 @@
 #include <Display.hpp>
 #include <chrono>
 #include <cstdlib>
+#include <utility>
 
 
-Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts, std::shared_ptr<LoadCell> load_cell) {
-    this->machine = machine;
-    this->relays = relays;
-    this->pts = pts;
-    this->open = true;
-    this->load_cell = load_cell;
+Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts, std::shared_ptr<LoadCell> load_cell) :
+    machine(machine), relays(relays), load_cell(load_cell), pts(pts) {
+
     setlocale(LC_ALL, "");
     initscr();
     start_color();

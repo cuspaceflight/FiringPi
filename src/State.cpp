@@ -34,26 +34,14 @@ const int StateMachine::valve_matrix[NUM_STATES][NUM_RELAYS]{
         {0, 0, 0, 0}
 };
 
-StateMachine::StateMachine(Relay *valves) {
-    state = OFF;
-    this->valves = valves;
-}
+StateMachine::StateMachine(Relay *valves) : state(OFF), valves(valves) {}
 
 bool StateMachine::canChangeTo(State next) const {
-    if (transition_matrix[state][next]) {
-        return true;
-    } else {
-        return false;
-    }
+    return transition_matrix[state][next];
 }
 
 bool StateMachine::changeState(State next) {
-    if (transition_matrix[state][next]) {
-        state = next;
-        return true;
-    } else {
-        return false;
-    }
+    state = transition_matrix[state][next]? next : state;
 }
 
 State StateMachine::update(int ch) {

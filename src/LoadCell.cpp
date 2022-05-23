@@ -1,4 +1,4 @@
-#include "../include/LoadCell.hpp"
+#include "LoadCell.hpp"
 
 LoadCell::LoadCell(int data, int clock) : DT(data), CLK(clock)
 {

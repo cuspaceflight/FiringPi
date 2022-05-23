@@ -20,7 +20,6 @@ public:
     Display(StateMachine *statemachine, Relay *relays, std::vector<PT*> *pts, std::shared_ptr<LoadCell> load_cell);
 
     void update();
-    bool open;
 
 private:
     int ch;
