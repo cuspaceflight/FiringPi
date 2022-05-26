@@ -10,7 +10,7 @@ LoadCell::LoadCell(int data, int clock) : DT(data), CLK(clock)
 
 bool LoadCell::init()
 {
-    unsigned long long timeout = 2e9;
+    unsigned long long timeout = 1e9;
     std::vector<HX711::Value> init_vals = load_cell->getValues(std::chrono::nanoseconds(timeout));
     std::cerr << init_vals.size() << std::endl;
     if (init_vals.size() > 0) {

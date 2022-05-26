@@ -166,3 +166,9 @@ void Display::draw_graphs() {
     wrefresh(graph_win);
 
 }
+
+void Display::write_error(std::string message) {
+    wattron(top_win, COLOR_PAIR(9));
+    mvwprintw(top_win, 2, (COLS - 27)/2, &message[0]);
+    wattroff(top_win, COLOR_PAIR(9));
+}

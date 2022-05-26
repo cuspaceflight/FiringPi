@@ -22,6 +22,7 @@ public:
 
     void update(bool update_now = false);
     bool open;
+    void write_error(std::string message);
 
 private:
     int ch;
