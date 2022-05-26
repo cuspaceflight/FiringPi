@@ -6,6 +6,7 @@
 
 // values of states
 enum State {
+    INIT,
     SAFE,
     ARMED,
     STARTUP,
