@@ -20,7 +20,7 @@ class Display {
 public:
     Display(StateMachine *statemachine, Relay *relays, std::vector<PT*> *pts, std::shared_ptr<LoadCell> load_cell, Logger *logger);
 
-    void update();
+    void update(bool update_now = false);
     bool open;
 
 private:

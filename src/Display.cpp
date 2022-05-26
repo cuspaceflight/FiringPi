@@ -35,12 +35,14 @@ Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts, s
     now = std::chrono::system_clock::now();
     last = now;
 
+    update(true);
+
 }
 
-void Display::update() {
+void Display::update(bool update_now) {
     now = std::chrono::system_clock::now();
     long diff = std::chrono::duration_cast<std::chrono::microseconds>(now - last).count();
-    if (diff < target_diff) { return; }
+    if (diff < target_diff && !update_now) { return; }
     last = std::chrono::system_clock::now();
 
     ch = getch();

@@ -38,7 +38,7 @@ const int StateMachine::valve_matrix[NUM_STATES][NUM_RELAYS]{
 };
 
 StateMachine::StateMachine(Relay *valves) {
-    state = OFF;
+    state = INIT;
     this->valves = valves;
 }
 

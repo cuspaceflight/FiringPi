@@ -21,6 +21,8 @@ int main() {
     Logger logger{&machine, &relays, &pts};
     Display display{&machine, &relays, &pts, load_cell, &logger};
 
+    load_cell->init();
+    machine.update('o');
 
     while (display.open) {
         display.update();
