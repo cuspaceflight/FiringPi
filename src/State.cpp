@@ -43,7 +43,7 @@ bool StateMachine::canChangeTo(State next) const {
     return transition_matrix[state][next];
 }
 
-bool StateMachine::changeState(State next) {
+void StateMachine::changeState(State next) {
     state = transition_matrix[state][next]? next : state;
 }
 

@@ -23,6 +23,8 @@ public:
     void update(bool update_now = false);
     void write_error(std::string message);
 
+    bool open;
+
 private:
     int ch;
     std::string hint;

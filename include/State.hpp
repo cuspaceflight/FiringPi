@@ -26,7 +26,7 @@ public:
 
     StateMachine(Relay *valves);
 
-    bool changeState(State next);
+    void changeState(State next);
 
     bool canChangeTo(State next) const;
 
