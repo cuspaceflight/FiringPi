@@ -22,9 +22,10 @@ INCDIR := include
 SOURCES := $(wildcard $(SRCDIR)/*.c $(SRCDIR)/*.cpp)
 OBJECTS := $(patsubst $(SRCDIR)%, $(BUILD)%, $(patsubst %.c,%.o, $(patsubst %.cpp,%.o,$(SOURCES))))
 
-INCLUDE := -I. -I./$(INCDIR)
-LIBPATH :=
-LIBS := -lncursesw -lwiringPi -li2c -lpthread -lhx711 -llgpio
+HEADERPATH := /usr/lib/aarch64-linux-gnu/hdf5/serial/include
+INCLUDE := -I. -I./$(INCDIR) -I$(HEADERPATH)
+LIBPATH := -L /usr/lib/aarch64-linux-gnu/hdf5/serial
+LIBS := -lncursesw -lwiringPi -li2c -lpthread -lhdf5 -lhdf5_hl_cpp -lhx711 -llgpio
 
 FLAGS := -Wall -g -otest
 CCFLAGS := $(FLAGS) -std=c99

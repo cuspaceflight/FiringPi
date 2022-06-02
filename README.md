@@ -15,7 +15,7 @@ will therefore need to make sure you have at least `libncurses5-dev` and `libncu
 the Raspberry Pi, [WiringPi](http://wiringpi.com/) is used for gpio access, which will need to be installed on your
 local machine to compile if you wish to do so. The raspberry Pi also uses [tmux](https://linuxhandbook.com/tmux/) to
 manage disconnects safely (the system leaving all of the valves open after an unhandled disconnect would not be good),
-so if you use the scripy [/pi](/pi), then you will also require this. All of these are already installed on the flight
+so if you use the script [/pi](/pi), then you will also require this. All of these are already installed on the flight
 computer.
 
 ## Building and running
@@ -28,7 +28,7 @@ make && ./main
 
 To build on the Pi, you need to have ssh access, and make sure you have updated its IP address in either [/pi](/pi).
 This file contains a script to upload source code directly to the Pi (with scp, no need for a git sync) and execute it
-over ssh, forcing interactive terminal allocation, then building the projcet on the pi and executing it in a detatched
+over ssh, forcing interactive terminal allocation, then building the project on the pi and executing it in a detatched
 tmux session. You can also just run the executable on the pi in tmux without building with `./pi -r` or conversely to
 build without running `./pi -b`
 

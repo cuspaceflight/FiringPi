@@ -2,6 +2,9 @@
 
 #include <thread>
 #include <hx711/SimpleHX711.h>
+#include <chrono>
+#include <vector>
+#include <iostream>
 
 class LoadCell
 {
@@ -9,6 +12,7 @@ public:
     LoadCell(int data, int clock);
 
     float get_weight() const;
+    bool init();
     void kill();
 
 private:

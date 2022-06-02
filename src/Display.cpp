@@ -1,11 +1,10 @@
 #include <Display.hpp>
 #include <chrono>
 #include <cstdlib>
-#include <utility>
 
 
-Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts, std::shared_ptr<LoadCell> load_cell) :
-    machine(machine), relays(relays), load_cell(load_cell), pts(pts) {
+Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts, std::shared_ptr<LoadCell> load_cell, Logger *logger) :
+    machine(machine), relays(relays), load_cell(load_cell), pts(pts), logger(logger) {
 
     setlocale(LC_ALL, "");
     initscr();
@@ -32,12 +31,14 @@ Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts, s
     now = std::chrono::system_clock::now();
     last = now;
 
+    update(true);
+
 }
 
-void Display::update() {
+void Display::update(bool update_now) {
     now = std::chrono::system_clock::now();
     long diff = std::chrono::duration_cast<std::chrono::microseconds>(now - last).count();
-    if (diff < target_diff) { return; }
+    if (diff < target_diff && !update_now) { return; }
     last = std::chrono::system_clock::now();
 
     ch = getch();
@@ -47,6 +48,8 @@ void Display::update() {
             break;
         case 'q':
             if (machine->state == OFF) {
+                logger->logging = false;
+                logger->thread_obj->join();
                 for (auto *pt: *pts) {
                     pt->is_alive = false;
                     pt->thread_obj->join();
@@ -158,4 +161,10 @@ void Display::draw_graphs() {
     box(graph_win,0,0);
     wrefresh(graph_win);
 
+}
+
+void Display::write_error(std::string message) {
+    wattron(top_win, COLOR_PAIR(9));
+    mvwprintw(top_win, 2, (COLS - 27)/2, &message[0]);
+    wattroff(top_win, COLOR_PAIR(9));
 }

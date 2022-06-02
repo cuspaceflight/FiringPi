@@ -12,14 +12,16 @@
 #include "State.hpp"
 #include "Relay.hpp"
 #include "PT.hpp"
+#include "Logger.hpp"
 #include "LoadCell.hpp"
 
 
 class Display {
 public:
-    Display(StateMachine *statemachine, Relay *relays, std::vector<PT*> *pts, std::shared_ptr<LoadCell> load_cell);
+    Display(StateMachine *statemachine, Relay *relays, std::vector<PT*> *pts, std::shared_ptr<LoadCell> load_cell, Logger *logger);
 
-    void update();
+    void update(bool update_now = false);
+    void write_error(std::string message);
 
 private:
     int ch;
@@ -31,6 +33,7 @@ private:
     Relay *relays;
     std::shared_ptr<LoadCell> load_cell;
     std::vector<PT*> *pts;
+    Logger *logger;
     std::chrono::time_point<std::chrono::system_clock> now, last;
 
     static const long target_diff = 1000000/60;

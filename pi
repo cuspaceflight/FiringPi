@@ -4,19 +4,19 @@ function usage {
   echo "Usage: $(basename $0) [-br]" 2>&1
   echo "          default:  build and run on the Pi"
   echo "    -b    build:    just compile on the Pi"
-  echo "    - run the existing binary in the Pi"
+  echo "    -r    run:      run the existing binary in the Pi"
 }
 
 
 if [ -z "$1" ] 
 then
     rsync -Cavuz include src cusf@cusfpi:FiringPi/ &&
-    ssh -tt cusf@cusfpi "make -C FiringPi && tmux -2 new -d ./FiringPi/main \; attach"
+    ssh -tt cusf@cusfpi "make -C FiringPi && tmux -2 new -d \"./FiringPi/main 2>./FiringPi/main.err\" \; attach"
 else
   while getopts brg arg; do
     case $arg in
       b) rsync -Cavuz include src Makefile cusf@cusfpi:FiringPi/ && ssh -tt cusf@cusfpi "make -C FiringPi" ;;
-      r) ssh -tt cusf@cusfpi "tmux -2 new -d ./FiringPi/main \; attach" ;;
+      r) ssh -tt cusf@cusfpi "tmux -2 new -d \"./FiringPi/main 2>./FiringPi/main.err\" \; attach" ;;
       ?) usage;;
     esac
   done
