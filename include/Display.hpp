@@ -21,9 +21,8 @@ public:
     Display(StateMachine *statemachine, Relay *relays, std::vector<PT*> *pts, std::shared_ptr<LoadCell> load_cell, Logger *logger);
 
     void update(bool update_now = false);
-    void write_error(std::string message);
-
     bool open;
+    void write_error(std::string message);
 
 private:
     int ch;

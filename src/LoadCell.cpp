@@ -33,8 +33,10 @@ void LoadCell::loop()
 
 void LoadCell::kill()
 {
-    is_alive = false;
-    obj->join();
+    if (is_alive) {
+        is_alive = false;
+        obj->join();
+    }
 }
 
 float LoadCell::get_weight() const
