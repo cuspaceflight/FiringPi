@@ -1,6 +1,6 @@
 #include "Relay.hpp"
 
-const int Relay::pins[NUM_RELAYS] = {23, 24, 12, 25};
+const int Relay::pins[NUM_VALVES] = {23, 24, 12, 25};
 
 Relay::Relay() {
     // no need to check error code of wiringPiSetup()
@@ -16,8 +16,9 @@ void Relay::set_output(int output, int value) {
     digitalWrite(pins[output], value);
 }
 
-void Relay::set_outputs(int *values) {
-    for (int i = 0; i < NUM_RELAYS; i++) {
-        digitalWrite(pins[i], values[i]);
+void Relay::set_outputs(const std::array<int, NUM_VALVES> *values) {
+    for (int i = 0; auto output: *values) {
+        digitalWrite(pins[i], output);
+        i++;
     }
 }

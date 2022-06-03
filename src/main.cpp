@@ -11,8 +11,8 @@
 
 int main() {
     std::vector<PT*> pts{
-        new PT(1,PT_ADDR,SAMPLING_FREQ),
-        new PT(4,PT_ADDR,SAMPLING_FREQ)
+        new PT(0,PT_ADDR,SAMPLING_FREQ,M32JM_00010B_350BG),
+        new PT(3,PT_ADDR,SAMPLING_FREQ,M32JM_00010B_350BG),
     };
 
     Relay relays;

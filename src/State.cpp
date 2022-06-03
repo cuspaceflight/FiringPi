@@ -14,7 +14,7 @@ const int StateMachine::colors[]{
 const bool StateMachine::transition_matrix[NUM_STATES][NUM_STATES]{
 //    INIT SAFE ARMED STARTUP FIRING SHUTDOWN ABORT ERROR  OFF
 
-        {true, true,  false,  false, false, false, false, true,  true},  //INIT
+        {true,  true,  false, false, false, false, false, true,  true},  //INIT
         {false, true,  true,  false, false, false, false, true,  true},  //SAFE
         {false, true,  true,  true,  false, false, false, true,  false}, //ARMED
         {false, false, false, true,  true,  false, true,  false, false}, //STARTUP
@@ -25,26 +25,45 @@ const bool StateMachine::transition_matrix[NUM_STATES][NUM_STATES]{
         {false, true,  false, false, false, false, false, false, true}   //OFF
 };
 
-const int StateMachine::valve_matrix[NUM_STATES][NUM_RELAYS]{
-        {1, 1, 1, 1},
-        {1, 1, 1, 1},
-        {0, 0, 0, 1},
-        {0, 0, 1, 0},
-        {0, 0, 1, 1},
-        {0, 1, 0, 0},
-        {0, 1, 0, 1},
-        {1, 1, 1, 0},
-        {0, 0, 0, 0}
+const std::vector<std::array<int, NUM_VALVES>> StateMachine::IPA_cft_solenoids{
+        {{0, 0, 0, 0, 0, 0, 1},
+         {1, 0, 0, 0, 0, 0, 0},
+         {1, 1, 0, 0, 0, 0, 0},
+         {1, 0, 0, 0, 0, 0, 0},
+         {1, 0, 1, 0, 0, 0, 0},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 1, 1, 1}}
 };
 
-StateMachine::StateMachine(Relay *valves) : state(INIT), valves(valves) {}
+const std::vector<std::array<int, NUM_VALVES>> StateMachine::N2O_cft_solenoids{
+        {{0, 0, 0, 1, 0, 0, 0},
+         {0, 0, 0, 0, 0, 1, 0},
+         {6, 6, 6, 6, 6, 6, 6},
+         {0, 0, 0, 0, 0, 0, 0},
+         {1, 0, 1, 0, 0, 0, 0},
+         {1, 0, 0, 0, 0, 0, 0},
+         {1, 1, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 1, 1, 1}}
+};
+
+const std::vector<std::array<int, NUM_VALVES>> StateMachine::H2O_cft_solenoids{
+        {{0, 0, 0, 1, 0, 0, 0},
+         {0, 0, 0, 0, 0, 0, 0},
+         {1, 0, 0, 0, 0, 0, 0},
+         {1, 1, 1, 0, 0, 0, 0},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 1, 1, 1}}
+};
+
+StateMachine::StateMachine(Relay *valves) : state(INIT), valves(valves), valve_matrix(&N2O_cft_solenoids) {}
 
 bool StateMachine::canChangeTo(State next) const {
     return transition_matrix[state][next];
 }
 
 void StateMachine::changeState(State next) {
-    state = transition_matrix[state][next]? next : state;
+    state = transition_matrix[state][next] ? next : state;
 }
 
 State StateMachine::update(int ch) {
@@ -76,7 +95,7 @@ State StateMachine::update(int ch) {
 }
 
 void StateMachine::process() const {
-    Relay::set_outputs((int *) valve_matrix[state]);
+    Relay::set_outputs(&(valve_matrix->at(state)));
     switch (state) {
         case INIT:
             break;

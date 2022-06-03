@@ -1,6 +1,8 @@
 #pragma once
 
 #include <chrono>
+#include <vector>
+#include <array>
 
 #include "Relay.hpp"
 
@@ -38,6 +40,11 @@ private:
     Relay *valves;
     std::chrono::time_point<std::chrono::system_clock> state_begin;
     static const bool transition_matrix[NUM_STATES][NUM_STATES];
-    static const int valve_matrix[NUM_STATES][NUM_RELAYS];
+
+    const std::vector<std::array<int, NUM_VALVES>> *valve_matrix;
+
+    static const std::vector<std::array<int, NUM_VALVES>> IPA_cft_solenoids;
+    static const std::vector<std::array<int, NUM_VALVES>> N2O_cft_solenoids;
+    static const std::vector<std::array<int, NUM_VALVES>> H2O_cft_solenoids;
 
 };
