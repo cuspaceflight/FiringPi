@@ -23,9 +23,9 @@ class Logger {
 
 private:
     
-    StateMachine *machine;
-    Relay *relays;
-    std::vector<PT*> *pts;
+    std::shared_ptr<StateMachine> machine;
+    std::shared_ptr<Relay> relays;
+    std::shared_ptr<std::vector<PT*>> pts;
     std::chrono::time_point<std::chrono::system_clock> now, startime;
 
     herr_t err;     /* Return value from function calls */
@@ -44,7 +44,9 @@ private:
 
 
 public:
-    Logger(StateMachine *machine, Relay *relays, std::vector<PT*> *pts);
+    Logger(std::shared_ptr<StateMachine> machine,
+           std::shared_ptr<Relay> relays,
+           std::shared_ptr<std::vector<PT*>> pts);
     bool logging;
     std::thread* thread_obj;
 };

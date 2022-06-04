@@ -1,11 +1,10 @@
 #include "Logger.hpp"
 
-Logger::Logger(StateMachine *machine, Relay *relays, std::vector<PT*> *pts) {
-    this->machine = machine;
-    this->relays = relays;
-    this->pts = pts;
-    this->logging = true;
-    //this->nPTs = this->pts.size();
+Logger::Logger(
+        std::shared_ptr<StateMachine> machine,
+        std::shared_ptr<Relay> relays,
+        std::shared_ptr<std::vector<PT*>> pts)
+    : machine(machine), relays(relays), pts(pts), logging(true), err(), ptable(), count() {
 
     const std::chrono::time_point<std::chrono::system_clock> now{std::chrono::system_clock::now()};
     time_t rawtime;

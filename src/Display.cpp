@@ -3,8 +3,14 @@
 #include <cstdlib>
 
 
-Display::Display(StateMachine *machine, Relay *relays, std::vector<PT *> *pts, std::shared_ptr<LoadCell> load_cell, Logger *logger) :
-    open(true), machine(machine), relays(relays), load_cell(load_cell), pts(pts), logger(logger) {
+Display::Display(
+        std::shared_ptr<StateMachine> machine,
+        std::shared_ptr<Relay> relays,
+        std::shared_ptr<std::vector<PT*>> pts,
+        std::shared_ptr<LoadCell> load_cell,
+        std::shared_ptr<Logger> logger
+    ) :
+        open(true), machine(machine), relays(relays), load_cell(load_cell), pts(pts), logger(logger) {
 
     setlocale(LC_ALL, "");
     initscr();

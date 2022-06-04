@@ -3,6 +3,7 @@
 #include <chrono>
 #include <vector>
 #include <array>
+#include <memory>
 
 #include "Relay.hpp"
 
@@ -26,7 +27,7 @@ public:
     static const char *names[NUM_STATES];
     static const int colors[NUM_STATES];
 
-    StateMachine(Relay *valves);
+    StateMachine(std::shared_ptr<Relay> valves);
 
     void changeState(State next);
 
@@ -37,7 +38,7 @@ public:
     void process() const;
 
 private:
-    Relay *valves;
+    std::shared_ptr<Relay> valves;
     std::chrono::time_point<std::chrono::system_clock> state_begin;
     static const bool transition_matrix[NUM_STATES][NUM_STATES];
 

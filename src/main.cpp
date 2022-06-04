@@ -1,5 +1,4 @@
 #include <string>
-#include <hx711/common.h>
 
 #include "State.hpp"
 #include "Display.hpp"
@@ -10,26 +9,27 @@
 #include "LoadCell.hpp"
 
 int main() {
-    std::vector<PT*> pts{
-        new PT(0,PT_ADDR,SAMPLING_FREQ,M32JM_00010B_350BG),
-        new PT(3,PT_ADDR,SAMPLING_FREQ,M32JM_00010B_350BG),
-    };
+    auto pts = std::make_shared<std::vector<PT*>>();
 
-    Relay relays;
-    std::shared_ptr<LoadCell> load_cell = std::make_shared<LoadCell>(5, 6);
-    StateMachine machine{&relays};
-    Logger logger{&machine, &relays, &pts};
-    Display display{&machine, &relays, &pts, load_cell, &logger};
+    pts->push_back(new PT(0, PT_ADDR, SAMPLING_FREQ, M32JM_00010B_350BG));
+    pts->push_back(new PT(3, PT_ADDR, SAMPLING_FREQ, M32JM_00010B_350BG));
+
+
+    auto relays = std::make_shared<Relay>();
+    auto load_cell = std::make_shared<LoadCell>(5, 6);
+    auto machine = std::make_shared<StateMachine>(relays);
+    auto logger = std::make_shared<Logger>(machine, relays, pts);
+    auto display = std::make_shared<Display>(machine, relays, pts, load_cell, logger);
 
     if (load_cell->init()) {
-        machine.update('o');
+        machine->update('o');
     } else {
-        machine.update('e');
-        display.write_error("Check load cell");
+        machine->update('e');
+        display->write_error("Check load cell");
     }
 
-    while (display.open) {
-        display.update();
-        machine.process();
+    while (display->open) {
+        display->update();
+        machine->process();
     }
 }

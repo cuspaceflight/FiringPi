@@ -1,5 +1,7 @@
 #include "State.hpp"
 
+#include <utility>
+
 // names of states
 const char *StateMachine::names[]{
         "INIT", "SAFE", "ARMED", "STARTUP", "FIRING", "SHUTDOWN", "ABORT", "ERROR", "OFF"
@@ -56,7 +58,7 @@ const std::vector<std::array<int, NUM_VALVES>> StateMachine::H2O_cft_solenoids{
          {0, 0, 0, 0, 1, 1, 1}}
 };
 
-StateMachine::StateMachine(Relay *valves) : state(INIT), valves(valves), valve_matrix(&N2O_cft_solenoids) {}
+StateMachine::StateMachine(std::shared_ptr<Relay> valves) : state(INIT), valves(valves), valve_matrix(&N2O_cft_solenoids) {}
 
 bool StateMachine::canChangeTo(State next) const {
     return transition_matrix[state][next];
@@ -95,7 +97,7 @@ State StateMachine::update(int ch) {
 }
 
 void StateMachine::process() const {
-    Relay::set_outputs(&(valve_matrix->at(state)));
+    valves->set_outputs(&(valve_matrix->at(state)));
     switch (state) {
         case INIT:
             break;

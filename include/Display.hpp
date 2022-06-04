@@ -18,7 +18,13 @@
 
 class Display {
 public:
-    Display(StateMachine *statemachine, Relay *relays, std::vector<PT*> *pts, std::shared_ptr<LoadCell> load_cell, Logger *logger);
+    Display(
+            std::shared_ptr<StateMachine> machine,
+            std::shared_ptr<Relay> relays,
+            std::shared_ptr<std::vector<PT*>> pts,
+            std::shared_ptr<LoadCell> load_cell,
+            std::shared_ptr<Logger> logger
+    );
 
     void update(bool update_now = false);
     bool open;
@@ -30,11 +36,11 @@ private:
     std::deque<float> graph_buffer;
     cchar_t space;
     WINDOW *main_win, *top_win, *left_win, *graph_win;
-    StateMachine *machine;
-    Relay *relays;
+    std::shared_ptr<StateMachine> machine;
+    std::shared_ptr<Relay> relays;
     std::shared_ptr<LoadCell> load_cell;
-    std::vector<PT*> *pts;
-    Logger *logger;
+    std::shared_ptr<std::vector<PT*>> pts;
+    std::shared_ptr<Logger> logger;
     std::chrono::time_point<std::chrono::system_clock> now, last;
 
     static const long target_diff = 1000000/60;
