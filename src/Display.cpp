@@ -6,11 +6,12 @@
 Display::Display(
         std::shared_ptr<StateMachine> machine,
         std::shared_ptr<Relay> relays,
-        std::shared_ptr<std::vector<PT*>> pts,
-        std::shared_ptr<LoadCell> load_cell,
+        std::shared_ptr<std::vector<PT *>> PTs,
+        std::shared_ptr<std::vector<LoadCell *>> LCs,
+        std::shared_ptr<std::vector<ADC *>> ADCs,
         std::shared_ptr<Logger> logger
-    ) :
-        open(true), machine(machine), relays(relays), load_cell(load_cell), pts(pts), logger(logger) {
+) :
+        open(true), machine(machine), relays(relays), LCs(LCs), PTs(PTs), ADCs(ADCs), logger(logger) {
 
     setlocale(LC_ALL, "");
     initscr();
@@ -56,11 +57,13 @@ void Display::update(bool update_now) {
             if (machine->state == OFF) {
                 logger->logging = false;
                 logger->thread_obj->join();
-                for (auto *pt: *pts) {
+                for (auto *pt: *PTs) {
                     pt->is_alive = false;
                     pt->thread_obj->join();
                 }
-                load_cell->kill();
+                for (auto *lc: *LCs) {
+                    lc->kill();
+                }
                 endwin();
                 exit(0);
             }
@@ -73,7 +76,7 @@ void Display::update(bool update_now) {
             reinitwin(main_win, LINES - 2, COLS - 2, 1, 1);
             reinitwin(top_win, 10, COLS - 27, 2, 24);
             reinitwin(left_win, LINES - 4, 20, 2, 3);
-            reinitwin(graph_win, (LINES - 14)/2, (COLS - 27)/2, 12, 24);
+            reinitwin(graph_win, (LINES - 14) / 2, (COLS - 27) / 2, 12, 24);
             break;
         default:
             machine->update(ch);
@@ -122,21 +125,32 @@ void Display::draw_state() {
 }
 
 void Display::draw_gauges() {
-    mvwprintw(top_win, 2, 4, "P0: %f", (*pts)[0]->pressure);
-    mvwprintw(top_win, 3, 4, "T0: %f", (*pts)[0]->temperature);
+    mvwprintw(top_win, 2, 4, "P0: %f", (*PTs)[0]->pressure);
+    mvwprintw(top_win, 3, 4, "T0: %f", (*PTs)[0]->temperature);
 
-    mvwprintw(top_win, 5, 4, "P1: %f", (*pts)[1]->pressure);
-    mvwprintw(top_win, 6, 4, "T1: %f", (*pts)[1]->temperature);
+    mvwprintw(top_win, 5, 4, "P1: %f", (*PTs)[1]->pressure);
+    mvwprintw(top_win, 6, 4, "T1: %f", (*PTs)[1]->temperature);
 
-    mvwprintw(top_win, 8, 4, "LC1: %f",load_cell->get_weight());
+    mvwprintw(top_win, 8, 4, "LC1: %f", (*LCs)[0]->get_weight());
+
+    mvwprintw(top_win, 5, 18, "ADC0/0: %f", (*ADCs)[0]->values[0]);
+    mvwprintw(top_win, 6, 18, "ADC0/1: %f", (*ADCs)[0]->values[1]);
+    mvwprintw(top_win, 7, 18, "ADC0/2: %f", (*ADCs)[0]->values[2]);
+    mvwprintw(top_win, 8, 18, "ADC0/3: %f", (*ADCs)[0]->values[3]);
+
+    mvwprintw(top_win, 5, 35, "ADC1/0: %f", (*ADCs)[1]->values[0]);
+    mvwprintw(top_win, 6, 35, "ADC1/1: %f", (*ADCs)[1]->values[1]);
+    mvwprintw(top_win, 7, 35, "ADC1/2: %f", (*ADCs)[1]->values[2]);
+    mvwprintw(top_win, 8, 35, "ADC1/3: %f", (*ADCs)[1]->values[3]);
 
     wrefresh(top_win);
+
 }
 
 void Display::draw_graphs() {
 
-    graph_buffer.push_back((*pts)[0]->pressure);
-    while ((int)graph_buffer.size()>2*(getmaxx(graph_win)-1)) { graph_buffer.pop_front(); }
+    graph_buffer.push_back((*PTs)[0]->pressure);
+    while ((int) graph_buffer.size() > 2 * (getmaxx(graph_win) - 1)) { graph_buffer.pop_front(); }
 
     int lookup_l[]{0x40, 0x4, 0x2, 0x1};
     int lookup_r[]{0x80, 0x20, 0x10, 0x8};
@@ -148,29 +162,29 @@ void Display::draw_graphs() {
 
 
     werase(graph_win);
-    for (int i = 0; i < (int)graph_buffer.size(); i += 2) {
-        pr = 1+graph_buffer[i];
-        pl = 1+graph_buffer[i + 1];
+    for (int i = 0; i < (int) graph_buffer.size(); i += 2) {
+        pr = 1 + graph_buffer[i];
+        pl = 1 + graph_buffer[i + 1];
         l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
         r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
-        if (std::fmod(pl,1/scale)==std::fmod(pr,1/scale)) {
+        if (std::fmod(pl, 1 / scale) == std::fmod(pr, 1 / scale)) {
             *(c->chars) = 0x2800 + l + r;
-            mvwadd_wch(graph_win, 7-(int) std::floor(scale * (pl-1)), 2 + i / 2, c);
+            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pl - 1)), 2 + i / 2, c);
         } else {
             *(c->chars) = 0x2800 + l;
-            mvwadd_wch(graph_win, 7-(int) std::floor(scale * (pl-1)), 2 + i / 2, c);
+            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pl - 1)), 2 + i / 2, c);
             *(c->chars) = 0x2800 + r;
-            mvwadd_wch(graph_win, 7-(int) std::floor(scale * (pr-1)), 2 + i / 2, c);
+            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pr - 1)), 2 + i / 2, c);
         }
 
     }
-    box(graph_win,0,0);
+    box(graph_win, 0, 0);
     wrefresh(graph_win);
 
 }
 
 void Display::write_error(std::string message) {
     wattron(top_win, COLOR_PAIR(9));
-    mvwprintw(top_win, 2, (COLS - 27)/2, &message[0]);
+    mvwprintw(top_win, 2, (COLS - 27) / 2, &message[0]);
     wattroff(top_win, COLOR_PAIR(9));
 }

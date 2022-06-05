@@ -17,22 +17,14 @@ extern "C" {
 #define PMAX 350
 #define PMIN 0
 
-enum PT_MODEL {
-    M32JM_00010B_350BG,
-    SEEED_114991178,
-    PXM319_070GI
-};
-
-
 
 class PT {
 public:
 
     float pressure, temperature;
     int file, addr, freq;
-    PT_MODEL model;
 
-    PT(int bus, int address, int frequency, PT_MODEL model);
+    PT(int bus, int address, int frequency);
 
     int recv();
     void loop();

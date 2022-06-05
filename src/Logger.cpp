@@ -4,7 +4,7 @@ Logger::Logger(
         std::shared_ptr<StateMachine> machine,
         std::shared_ptr<Relay> relays,
         std::shared_ptr<std::vector<PT*>> pts)
-    : machine(machine), relays(relays), pts(pts), logging(true), err(), ptable(), count() {
+    : machine(machine), relays(relays), pts(pts), err(), ptable(), count(), logging(true) {
 
     const std::chrono::time_point<std::chrono::system_clock> now{std::chrono::system_clock::now()};
     time_t rawtime;
