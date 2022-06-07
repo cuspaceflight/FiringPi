@@ -12,10 +12,9 @@
 int main() {
     auto PTs = std::make_shared<std::vector<PT*>>();
 
-    PTs->push_back(new PT(0, M32JM_ADDR, SAMPLING_FREQ));
     PTs->push_back(new PT(1, M32JM_ADDR, SAMPLING_FREQ));
-    PTs->push_back(new PT(3, M32JM_ADDR, SAMPLING_FREQ));
     PTs->push_back(new PT(4, M32JM_ADDR, SAMPLING_FREQ));
+    PTs->push_back(new PT(6, M32JM_ADDR, SAMPLING_FREQ));
 
     auto LCs = std::make_shared<std::vector<LoadCell*>>();
 

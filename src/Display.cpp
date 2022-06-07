@@ -125,13 +125,16 @@ void Display::draw_state() {
 }
 
 void Display::draw_gauges() {
-    mvwprintw(top_win, 2, 4, "P0: %f", (*PTs)[0]->pressure);
-    mvwprintw(top_win, 3, 4, "T0: %f", (*PTs)[0]->temperature);
+    mvwprintw(top_win, 1, 4, "P0: %f", (*PTs)[0]->pressure);
+    mvwprintw(top_win, 2, 4, "T0: %f", (*PTs)[0]->temperature);
 
-    mvwprintw(top_win, 5, 4, "P1: %f", (*PTs)[1]->pressure);
-    mvwprintw(top_win, 6, 4, "T1: %f", (*PTs)[1]->temperature);
+    mvwprintw(top_win, 4, 4, "P1: %f", (*PTs)[1]->pressure);
+    mvwprintw(top_win, 5, 4, "T1: %f", (*PTs)[1]->temperature);
 
-    mvwprintw(top_win, 8, 4, "LC1: %f", (*LCs)[0]->get_weight());
+    mvwprintw(top_win, 7, 4, "P2: %f", (*PTs)[2]->pressure);
+    mvwprintw(top_win, 8, 4, "T2: %f", (*PTs)[2]->temperature);
+
+    mvwprintw(top_win, 1, 18, "LC1: %f", (*LCs)[0]->get_weight());
 
     mvwprintw(top_win, 5, 18, "ADC0/0: %f", (*ADCs)[0]->values[0]);
     mvwprintw(top_win, 6, 18, "ADC0/1: %f", (*ADCs)[0]->values[1]);

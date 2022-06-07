@@ -56,4 +56,5 @@ void PT::loop() {
         this->recv();
         std::this_thread::sleep_for(std::chrono::microseconds((const int) 1e6 / freq));
     }
+    close(this->file);
 }
