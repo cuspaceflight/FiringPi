@@ -1,16 +1,20 @@
+#pragma once
+
 extern "C" {
 #include <linux/i2c-dev.h>
 #include <i2c/smbus.h>
 }
 
 #include "../include/defines.hpp"
+#include <unistd.h>
+#include <fcntl.h>
 #include <iostream>
 #include <sys/ioctl.h>
 #include <thread>
 #include <chrono>
 #include <array>
 
-#define NUM_SERVOS 2
+#define NUM_SERVOS 3
  
 #define OSC_FREQ 25000000L
  /* Register address and bit positions/masks for the devices internal registers */
@@ -66,13 +70,13 @@ extern "C" {
 class Servo {
     private:
         int position;
-        int file, freq;
+        int file, freq, addr;
         static const int channels[NUM_SERVOS];
-        static void WriteReg(unsigned char reg, unsigned char data);
-        static void OutputOnTime(unsigned char chan, uint16_t time);
-        static void OutputOffTime(unsigned char chan, uint16_t time);
+        void WriteReg(unsigned char reg, unsigned char data);
+        void OutputOnTime(unsigned char chan, uint16_t time);
+        void OutputOffTime(unsigned char chan, uint16_t time);
     public:
         Servo(int bus, int address);
-        static void write_position(int chan, int Pos);
-        static void write_positions(const std::array<bool, NUM_SERVOS> *values);
-}
+        void write_position(unsigned char chan, uint16_t Pos);
+        void write_positions(const std::array<uint16_t, NUM_SERVOS> *values);
+};

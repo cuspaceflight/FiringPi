@@ -25,7 +25,6 @@ enum State {
 class StateMachine {
 public:
     State state;
-    Servo servos;
     static const char *names[NUM_STATES];
     static const int colors[NUM_STATES];
 
@@ -41,6 +40,7 @@ public:
 
 private:
     std::shared_ptr<Relay> valves;
+    std::shared_ptr<Servo> servos;
     std::chrono::time_point<std::chrono::system_clock> state_begin;
     static const bool transition_matrix[NUM_STATES][NUM_STATES];
 
