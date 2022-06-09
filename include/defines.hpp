@@ -3,6 +3,7 @@
 #define ADC0_ADDR      0x48
 #define ADC1_ADDR      0x49
 
+#define SERVO_ADDR     0x40
 #define SERVO_FREQ     50L
 #define SERVO_TRIM_MIN 110  //
 #define SERVO_TRIM_MAX 590  // Trim these values to set servo limits and open position

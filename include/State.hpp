@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "Relay.hpp"
+#include "Servo.hpp"
 
 // values of states
 enum State {
@@ -24,10 +25,11 @@ enum State {
 class StateMachine {
 public:
     State state;
+    Servo servos;
     static const char *names[NUM_STATES];
     static const int colors[NUM_STATES];
 
-    StateMachine(std::shared_ptr<Relay> valves);
+    StateMachine(std::shared_ptr<Relay> valves, std::shared_ptr<Servo> servos);
 
     void changeState(State next);
 

@@ -1,6 +1,6 @@
 #include "../include/Servo.hpp"
 
-const int Relay::channels[NUM_SERVOS] = {0, 1}
+const int Relay::channels[NUM_SERVOS] = {0, 1, 2}
 
 Servo::Servo(int bus, int address, int ) : {
     char filename[20];
