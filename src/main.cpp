@@ -8,6 +8,7 @@
 #include "defines.hpp"
 #include "LoadCell.hpp"
 #include "ADC.hpp"
+#include "Servo.hpp"
 
 int main() {
     auto PTs = std::make_shared<std::vector<PT*>>();
@@ -26,6 +27,7 @@ int main() {
     ADCs->push_back(new ADC(6,ADC1_ADDR,200));
 
     auto relays = std::make_shared<Relay>();
+    auto servos = std::make_shared<Servo>();
     auto machine = std::make_shared<StateMachine>(relays);
     auto logger = std::make_shared<Logger>(machine, relays, PTs);
     auto display = std::make_shared<Display>(machine, relays, PTs, LCs, ADCs, logger);
