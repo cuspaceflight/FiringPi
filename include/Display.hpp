@@ -37,9 +37,11 @@ public:
 private:
     int ch;
     std::string hint;
-    std::vector<std::deque<float>> graph_buffers;
+    std::vector<std::deque<float>> graph_bufs;
     cchar_t space;
-    WINDOW *main_win, *top_win, *left_win, *graph_win;
+    WINDOW *main_win, *top_win, *left_win;
+    std::array<WINDOW *,4> graphs;
+    std::array<float *, 4> graph_srcs;
     std::shared_ptr<StateMachine> machine;
     std::shared_ptr<Relay> relays;
     std::shared_ptr<std::vector<LoadCell *>> LCs;
@@ -56,6 +58,6 @@ private:
 
     void draw_gauges();
 
-    void draw_graphs();
+    void draw_graphs(int i);
 
 };

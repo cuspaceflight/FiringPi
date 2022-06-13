@@ -15,7 +15,7 @@ Display::Display(
 
     for (int i = 0; i < (int) PTs->size(); i++) {
         std::deque<float> temp;
-        this->graph_buffers.push_back(temp);
+        this->graph_bufs.push_back(temp);
     }
 
     setlocale(LC_ALL, "");
@@ -34,7 +34,16 @@ Display::Display(
     main_win = newwin(0, 0, 1, 1);
     top_win = newwin(0, 0, 2, 24);
     left_win = newwin(0, 0, 2, 3);
-    graph_win = newwin(0, 0, 12, 25);
+    graphs[0] = newwin((LINES - 14) / 2, (COLS - 27) / 2, 12, 24);
+    graphs[1] = newwin((LINES - 14) / 2, (COLS - 27) / 2, 12, 24 + (COLS - 25) / 2);
+    graphs[2] = newwin((LINES - 14) / 2, (COLS - 27) / 2, 12 + (LINES - 14) / 2, 24);
+    graphs[3] = newwin((LINES - 14) / 2, (COLS - 27) / 2, 12 + (LINES - 14) / 2, 24 + (COLS - 25) / 2);
+
+    graph_srcs[0] = &((*PTs)[0]->*(&PT::pressure)); // produces a pointer to an arbitrary float in a class
+    graph_srcs[1] = &((*PTs)[1]->*(&PT::pressure));
+    graph_srcs[2] = &((*PTs)[2]->*(&PT::pressure));
+    graph_srcs[3] = &(((*ADCs)[0]->*(&ADC::values))[0]);
+
 
     ungetch(KEY_RESIZE);
     hint = "PRESS s[afe] OR q[uit]";
@@ -81,7 +90,11 @@ void Display::update(bool update_now) {
             reinitwin(main_win, LINES - 2, COLS - 2, 1, 1);
             reinitwin(top_win, 10, COLS - 27, 2, 24);
             reinitwin(left_win, LINES - 4, 20, 2, 3);
-            reinitwin(graph_win, (LINES - 14) / 2, (COLS - 27) / 2, 12, 24);
+
+            reinitwin(graphs[0], (LINES - 14) / 2, (COLS - 27) / 2, 12, 24);
+            reinitwin(graphs[1], (LINES - 14) / 2, (COLS - 27) / 2, 12, 24 + (COLS - 25) / 2);
+            reinitwin(graphs[2], (LINES - 14) / 2, (COLS - 27) / 2, 12 + (LINES - 14) / 2, 24);
+            reinitwin(graphs[3], (LINES - 14) / 2, (COLS - 27) / 2, 12 + (LINES - 14) / 2, 24 + (COLS - 25) / 2);
             break;
         default:
             machine->update(ch);
@@ -90,7 +103,7 @@ void Display::update(bool update_now) {
 
     draw_state();
     draw_gauges();
-    draw_graphs();
+    for (int i = 0; i < 3; i++) draw_graphs(i);
 
     mvhline_set(0, 0, &space, COLS - 10);
 
@@ -152,46 +165,50 @@ void Display::draw_gauges() {
 
 }
 
-void Display::draw_graphs() {
+void Display::draw_graphs(int i) {
+
     int lookup_l[]{0x40, 0x4, 0x2, 0x1};
     int lookup_r[]{0x80, 0x20, 0x10, 0x8};
 
     cchar_t *c;
     c->attr = COLOR_PAIR(2);
     int l, r;
-    float pr, pl, scale{10};
-    werase(graph_win);
+    float pr, pl, max, min, scale, gauge_offset;
+    werase(graphs[i]);
 
-    int i = 0;
-    for (auto &buffer: this->graph_buffers) {
-        if (i != 0) break;
+    max = *std::max_element(graph_bufs[i].begin(), graph_bufs[i].end());
+    min = *std::min_element(graph_bufs[i].begin(), graph_bufs[i].end());
 
-        buffer.push_back((*PTs)[i]->pressure);
-        while ((int) buffer.size() > 2 * (getmaxx(graph_win) - 1)) {
-            buffer.pop_front();
-            std::cerr << "pop" << std::endl;
-        }
+    scale = std::min(std::abs(7.0f / (max - min)), 50.0f);
+    gauge_offset = 1.3; //(int) std::floor(scale * max);
 
-        for (int j = 0; j < (int) buffer.size(); j += 2) {
-            pr = 1 + buffer[j];
-            pl = 1 + buffer[j + 1];
-            l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
-            r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
-            if (std::fmod(pl, 1 / scale) == std::fmod(pr, 1 / scale)) {
-                *(c->chars) = 0x2800 + l + r;
-                mvwadd_wch(graph_win, 7 * (1 + i) - (int) std::floor(scale * (pl - 1)), 2 + j / 2, c);
-            } else {
-                *(c->chars) = 0x2800 + l;
-                mvwadd_wch(graph_win, 7 * (1 + i) - (int) std::floor(scale * (pl - 1)), 2 + j / 2, c);
-                *(c->chars) = 0x2800 + r;
-                mvwadd_wch(graph_win, 7 * (1 + i) - (int) std::floor(scale * (pr - 1)), 2 + j / 2, c);
-            }
+    graph_bufs[i].push_back(*graph_srcs[i]);
 
-        }
-        i++;
+    while ((int) graph_bufs[i].size() > 2 * (getmaxx(graphs[i]) - 1)) {
+        graph_bufs[i].pop_front();
     }
-    box(graph_win, 0, 0);
-    wrefresh(graph_win);
+
+    for (int j = 0; j < (int) graph_bufs[i].size(); j += 2) {
+        pr = graph_bufs[i][j] - gauge_offset;
+        pl = graph_bufs[i][j + 1] - gauge_offset;
+        l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
+        r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
+        if (std::fmod(pl, 1 / scale) == std::fmod(pr, 1 / scale)) {
+            *(c->chars) = 0x2800 + l + r;
+            mvwadd_wch(graphs[i], 1 - (int) std::floor(scale * (pl + gauge_offset)), 2 + j / 2, c);
+        } else {
+            *(c->chars) = 0x2800 + l;
+            mvwadd_wch(graphs[i], 1 - (int) std::floor(scale * (pl + gauge_offset)), 2 + j / 2, c);
+            *(c->chars) = 0x2800 + r;
+            mvwadd_wch(graphs[i], 1 - (int) std::floor(scale * (pr + gauge_offset)), 2 + j / 2, c);
+        }
+
+    }
+    mvwprintw(graphs[i], 1 - (int) std::floor(scale * max), 1, "%.2f", max);
+    mvwprintw(graphs[i], 1 - (int) std::floor(scale * min), 1, "%.2f", min);
+
+    box(graphs[i], 0, 0);
+    wrefresh(graphs[i]);
 
 }
 
