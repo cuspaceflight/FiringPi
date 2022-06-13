@@ -13,7 +13,7 @@ Display::Display(
 ) :
         open(true), machine(machine), relays(relays), LCs(LCs), PTs(PTs), ADCs(ADCs), logger(logger) {
 
-    for (int i = 0; i < (int)PTs->size(); i++) {
+    for (int i = 0; i < (int) PTs->size(); i++) {
         std::deque<float> temp;
         this->graph_buffers.push_back(temp);
     }
@@ -141,22 +141,18 @@ void Display::draw_gauges() {
 
     mvwprintw(top_win, 1, 18, "LC1: %f", (*LCs)[0]->get_weight());
 
-    mvwprintw(top_win, 5, 18, "ADC0/0: %f", (*ADCs)[0]->values[0]);
-    mvwprintw(top_win, 6, 18, "ADC0/1: %f", (*ADCs)[0]->values[1]);
-    mvwprintw(top_win, 7, 18, "ADC0/2: %f", (*ADCs)[0]->values[2]);
-    mvwprintw(top_win, 8, 18, "ADC0/3: %f", (*ADCs)[0]->values[3]);
 
-    mvwprintw(top_win, 5, 35, "ADC1/0: %f", (*ADCs)[1]->values[0]);
-    mvwprintw(top_win, 6, 35, "ADC1/1: %f", (*ADCs)[1]->values[1]);
-    mvwprintw(top_win, 7, 35, "ADC1/2: %f", (*ADCs)[1]->values[2]);
-    mvwprintw(top_win, 8, 35, "ADC1/3: %f", (*ADCs)[1]->values[3]);
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 4; j++) {
+            mvwprintw(top_win, 5 + j, 18 + 20 * i, "ADC%d/%d: %f", i, j, (*ADCs)[i]->values[j] / 1000.0f);
+        }
+    }
 
     wrefresh(top_win);
 
 }
 
 void Display::draw_graphs() {
-    int i = 0;
     int lookup_l[]{0x40, 0x4, 0x2, 0x1};
     int lookup_r[]{0x80, 0x20, 0x10, 0x8};
 
@@ -166,11 +162,15 @@ void Display::draw_graphs() {
     float pr, pl, scale{10};
     werase(graph_win);
 
-    for (auto buffer: this->graph_buffers) {
+    int i = 0;
+    for (auto &buffer: this->graph_buffers) {
+        if (i != 0) break;
 
-
-        buffer.push_back((*PTs)[0]->pressure);
-        while ((int) buffer.size() > 2 * (getmaxx(graph_win) - 1)) { buffer.pop_front(); }
+        buffer.push_back((*PTs)[i]->pressure);
+        while ((int) buffer.size() > 2 * (getmaxx(graph_win) - 1)) {
+            buffer.pop_front();
+            std::cerr << "pop" << std::endl;
+        }
 
         for (int j = 0; j < (int) buffer.size(); j += 2) {
             pr = 1 + buffer[j];
@@ -179,12 +179,12 @@ void Display::draw_graphs() {
             r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
             if (std::fmod(pl, 1 / scale) == std::fmod(pr, 1 / scale)) {
                 *(c->chars) = 0x2800 + l + r;
-                mvwadd_wch(graph_win, 7*(1+i) - (int) std::floor(scale * (pl - 1)), 2 + j / 2, c);
+                mvwadd_wch(graph_win, 7 * (1 + i) - (int) std::floor(scale * (pl - 1)), 2 + j / 2, c);
             } else {
                 *(c->chars) = 0x2800 + l;
-                mvwadd_wch(graph_win, 7*(1+i) - (int) std::floor(scale * (pl - 1)), 2 + j / 2, c);
+                mvwadd_wch(graph_win, 7 * (1 + i) - (int) std::floor(scale * (pl - 1)), 2 + j / 2, c);
                 *(c->chars) = 0x2800 + r;
-                mvwadd_wch(graph_win, 7*(1+i) - (int) std::floor(scale * (pr - 1)), 2 + j / 2, c);
+                mvwadd_wch(graph_win, 7 * (1 + i) - (int) std::floor(scale * (pr - 1)), 2 + j / 2, c);
             }
 
         }
