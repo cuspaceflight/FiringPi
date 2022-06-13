@@ -170,42 +170,45 @@ void Display::draw_graphs(int i) {
     int lookup_l[]{0x40, 0x4, 0x2, 0x1};
     int lookup_r[]{0x80, 0x20, 0x10, 0x8};
 
-    cchar_t *c;
-    c->attr = COLOR_PAIR(2);
-    int l, r;
-    float pr, pl, max, min, scale, gauge_offset;
-    werase(graphs[i]);
-
-    max = *std::max_element(graph_bufs[i].begin(), graph_bufs[i].end());
-    min = *std::min_element(graph_bufs[i].begin(), graph_bufs[i].end());
-
-    scale = std::min(std::abs(7.0f / (max - min)), 50.0f);
-    gauge_offset = 1.3; //(int) std::floor(scale * max);
-
     graph_bufs[i].push_back(*graph_srcs[i]);
 
     while ((int) graph_bufs[i].size() > 2 * (getmaxx(graphs[i]) - 1)) {
         graph_bufs[i].pop_front();
     }
 
+
+    cchar_t *c;
+    c->attr = COLOR_PAIR(2);
+    int l, r, height;
+    float pr, pl, max, min, scale;
+    werase(graphs[i]);
+
+    max = *std::max_element(graph_bufs[i].begin(), graph_bufs[i].end());
+    min = *std::min_element(graph_bufs[i].begin(), graph_bufs[i].end());
+
+    height = getmaxy(graphs[i]) - 2;
+    scale = std::min((float) (height-1) / (max - min), 50.0f);
+
+
     for (int j = 0; j < (int) graph_bufs[i].size(); j += 2) {
-        pr = graph_bufs[i][j] - gauge_offset;
-        pl = graph_bufs[i][j + 1] - gauge_offset;
+        pr = graph_bufs[i][j] - min;
+        pl = graph_bufs[i][j + 1] - min;
+
         l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
         r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
         if (std::fmod(pl, 1 / scale) == std::fmod(pr, 1 / scale)) {
             *(c->chars) = 0x2800 + l + r;
-            mvwadd_wch(graphs[i], 1 - (int) std::floor(scale * (pl + gauge_offset)), 2 + j / 2, c);
+            mvwadd_wch(graphs[i], height - (int) std::floor(scale * pl), 2 + j / 2, c);
         } else {
             *(c->chars) = 0x2800 + l;
-            mvwadd_wch(graphs[i], 1 - (int) std::floor(scale * (pl + gauge_offset)), 2 + j / 2, c);
+            mvwadd_wch(graphs[i], height - (int) std::floor(scale * pl), 2 + j / 2, c);
             *(c->chars) = 0x2800 + r;
-            mvwadd_wch(graphs[i], 1 - (int) std::floor(scale * (pr + gauge_offset)), 2 + j / 2, c);
+            mvwadd_wch(graphs[i], height - (int) std::floor(scale * pr), 2 + j / 2, c);
         }
 
     }
-    mvwprintw(graphs[i], 1 - (int) std::floor(scale * max), 1, "%.2f", max);
-    mvwprintw(graphs[i], 1 - (int) std::floor(scale * min), 1, "%.2f", min);
+    mvwprintw(graphs[i], height - (int) std::floor(scale * (max - min)), 1, "%.2f", max);
+    mvwprintw(graphs[i], height, 1, "%.2f", min);
 
     box(graphs[i], 0, 0);
     wrefresh(graphs[i]);
