@@ -37,7 +37,7 @@ public:
 private:
     int ch;
     std::string hint;
-    std::deque<float> graph_buffer;
+    std::vector<std::deque<float>> graph_buffers;
     cchar_t space;
     WINDOW *main_win, *top_win, *left_win, *graph_win;
     std::shared_ptr<StateMachine> machine;

@@ -1,7 +1,5 @@
 #include "State.hpp"
 
-#include <utility>
-
 // names of states
 const char *StateMachine::names[]{
         "INIT", "SAFE", "ARMED", "STARTUP", "FIRING", "SHUTDOWN", "ABORT", "ERROR", "OFF"
@@ -102,8 +100,10 @@ void StateMachine::process() const {
         case INIT:
             break;
         case SAFE:
+            servos->write_position(0,400);
             break;
         case ARMED:
+            servos->write_position(0,300);
             break;
         case STARTUP:
             break;

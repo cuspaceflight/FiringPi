@@ -71,7 +71,7 @@ void Servo::OutputOnTime(unsigned char chan, uint16_t time) {
     buffer[2] = time >> 8;
     int length = 3;
     if ( write(file, buffer, length) != length ) {
-        std::cerr << "Failed to set servo off time.\n" << std::endl;
+        std::cerr << "Failed to set servo on time.\n" << std::endl;
     }
 }
 

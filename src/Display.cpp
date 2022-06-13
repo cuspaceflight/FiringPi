@@ -13,6 +13,11 @@ Display::Display(
 ) :
         open(true), machine(machine), relays(relays), LCs(LCs), PTs(PTs), ADCs(ADCs), logger(logger) {
 
+    for (int i = 0; i < (int)PTs->size(); i++) {
+        std::deque<float> temp;
+        this->graph_buffers.push_back(temp);
+    }
+
     setlocale(LC_ALL, "");
     initscr();
     start_color();
@@ -151,10 +156,7 @@ void Display::draw_gauges() {
 }
 
 void Display::draw_graphs() {
-
-    graph_buffer.push_back((*PTs)[0]->pressure);
-    while ((int) graph_buffer.size() > 2 * (getmaxx(graph_win) - 1)) { graph_buffer.pop_front(); }
-
+    int i = 0;
     int lookup_l[]{0x40, 0x4, 0x2, 0x1};
     int lookup_r[]{0x80, 0x20, 0x10, 0x8};
 
@@ -162,24 +164,31 @@ void Display::draw_graphs() {
     c->attr = COLOR_PAIR(2);
     int l, r;
     float pr, pl, scale{10};
-
-
     werase(graph_win);
-    for (int i = 0; i < (int) graph_buffer.size(); i += 2) {
-        pr = 1 + graph_buffer[i];
-        pl = 1 + graph_buffer[i + 1];
-        l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
-        r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
-        if (std::fmod(pl, 1 / scale) == std::fmod(pr, 1 / scale)) {
-            *(c->chars) = 0x2800 + l + r;
-            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pl - 1)), 2 + i / 2, c);
-        } else {
-            *(c->chars) = 0x2800 + l;
-            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pl - 1)), 2 + i / 2, c);
-            *(c->chars) = 0x2800 + r;
-            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pr - 1)), 2 + i / 2, c);
-        }
 
+    for (auto buffer: this->graph_buffers) {
+
+
+        buffer.push_back((*PTs)[0]->pressure);
+        while ((int) buffer.size() > 2 * (getmaxx(graph_win) - 1)) { buffer.pop_front(); }
+
+        for (int j = 0; j < (int) buffer.size(); j += 2) {
+            pr = 1 + buffer[j];
+            pl = 1 + buffer[j + 1];
+            l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
+            r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
+            if (std::fmod(pl, 1 / scale) == std::fmod(pr, 1 / scale)) {
+                *(c->chars) = 0x2800 + l + r;
+                mvwadd_wch(graph_win, 7*(1+i) - (int) std::floor(scale * (pl - 1)), 2 + j / 2, c);
+            } else {
+                *(c->chars) = 0x2800 + l;
+                mvwadd_wch(graph_win, 7*(1+i) - (int) std::floor(scale * (pl - 1)), 2 + j / 2, c);
+                *(c->chars) = 0x2800 + r;
+                mvwadd_wch(graph_win, 7*(1+i) - (int) std::floor(scale * (pr - 1)), 2 + j / 2, c);
+            }
+
+        }
+        i++;
     }
     box(graph_win, 0, 0);
     wrefresh(graph_win);

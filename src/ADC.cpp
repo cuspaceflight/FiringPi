@@ -21,24 +21,21 @@ ADC::ADC(int bus, int addr, int freq) : freq(freq), values(), is_alive(true) {
 }
 
 int ADC::recv() {
-    auto start = std::chrono::system_clock::now();
     char buf[3];
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         buf[0] = 0x01;
-        buf[1] = 0xC2 + (i << 4);
+        buf[1] = 0x42 + (i << 4);
         buf[2] = 0x83;
-        std::cerr<<"about to write to status "<<(std::chrono::system_clock::now()-start).count()<<std::endl;
         write(this->file, buf, 3);
         buf[0] = 0x00;
-        std::cerr<<"about to write to pointer "<<(std::chrono::system_clock::now()-start).count()<<std::endl;
         write(this->file, buf ,1);
-        std::cerr<<"about to read conversion "<<(std::chrono::system_clock::now()-start).count()<<std::endl;
         read(this->file, buf, 2);
         int out = (buf[0]<<4)+buf[1];
-
+        // TODO try using SMBus instead of i2c-dev (the file commands on /dev/i2c-%d)
         // TODO need a decoding function for each sensor
         this->values[i] = (float)out;
     }
+    read(file, buf, 0);
     return 0;
 }
 
