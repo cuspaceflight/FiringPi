@@ -23,8 +23,8 @@ int main() {
 
     auto ADCs = std::make_shared<std::vector<ADC*>>();
 
-    ADCs->push_back(new ADC(1,ADC0_ADDR,200));
-    ADCs->push_back(new ADC(3,ADC1_ADDR,200));
+    ADCs->push_back(new ADC(1,ADC0_ADDR,300));
+    ADCs->push_back(new ADC(3,ADC1_ADDR,300));
 
     auto relays = std::make_shared<Relay>();
     auto servos = std::make_shared<Servo>(4, 40);

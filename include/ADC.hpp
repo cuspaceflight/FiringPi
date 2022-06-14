@@ -24,7 +24,7 @@ public:
 
     Sensor types[4];
     int file, freq;
-    float values[4];
+    float values[4], k_filter;
 
     int recv();
     void loop();

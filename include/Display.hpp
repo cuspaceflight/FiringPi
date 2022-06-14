@@ -37,17 +37,21 @@ public:
 private:
     int ch;
     std::string hint;
-    std::vector<std::deque<float>> graph_bufs;
     cchar_t space;
+
+    std::vector<std::deque<float>> graph_bufs;
     WINDOW *main_win, *top_win, *left_win;
     std::array<WINDOW *,4> graphs;
     std::array<float *, 4> graph_srcs;
+    int graph_count, graph_interval;
+
     std::shared_ptr<StateMachine> machine;
     std::shared_ptr<Relay> relays;
     std::shared_ptr<std::vector<LoadCell *>> LCs;
     std::shared_ptr<std::vector<PT *>> PTs;
     std::shared_ptr<std::vector<ADC *>> ADCs;
     std::shared_ptr<Logger> logger;
+
     std::chrono::time_point<std::chrono::system_clock> now, last;
 
     static const long target_diff = 1000000 / 60;

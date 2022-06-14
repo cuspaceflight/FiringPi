@@ -100,10 +100,8 @@ void StateMachine::process() const {
         case INIT:
             break;
         case SAFE:
-            servos->write_position(0,400);
             break;
         case ARMED:
-            servos->write_position(0,300);
             break;
         case STARTUP:
             break;
