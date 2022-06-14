@@ -21,7 +21,7 @@ extern "C" {
 class PT {
 public:
 
-    float pressure, temperature;
+    float pressure, temperature, k_filter{0.4};
     int file, addr, freq;
 
     PT(int bus, int address, int frequency);

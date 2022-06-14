@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "Relay.hpp"
+#include "Servo.hpp"
 
 // values of states
 enum State {
@@ -27,7 +28,7 @@ public:
     static const char *names[NUM_STATES];
     static const int colors[NUM_STATES];
 
-    StateMachine(std::shared_ptr<Relay> valves);
+    StateMachine(std::shared_ptr<Relay> valves, std::shared_ptr<Servo> servos);
 
     void changeState(State next);
 
@@ -39,6 +40,7 @@ public:
 
 private:
     std::shared_ptr<Relay> valves;
+    std::shared_ptr<Servo> servos;
     std::chrono::time_point<std::chrono::system_clock> state_begin;
     static const bool transition_matrix[NUM_STATES][NUM_STATES];
 

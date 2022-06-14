@@ -41,10 +41,10 @@ int PT::recv() {
     float tmp;
 
     tmp = (PMAX - PMIN) / 14000.0f * (float) (((buf[0] << 8) | buf[1]) - 1000) + PMIN;
-    if (tmp > -1 && tmp < 350) { pressure = tmp; }
+    if (tmp > -1 && tmp < 350) { pressure*=1-k_filter; pressure += k_filter*tmp; }
 
     tmp = (200 / 2048.0f) * (float) ((buf[2] << 3) | (buf[3] >> 5)) - 50.0f;
-    if (tmp < 125 && tmp > -40) { temperature = tmp; }
+    if (tmp < 125 && tmp > -40) { temperature*=1-k_filter; temperature += k_filter*tmp; }
     read(file, buf, 0);
     return 0;
 

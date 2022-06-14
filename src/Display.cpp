@@ -11,7 +11,9 @@ Display::Display(
         std::shared_ptr<std::vector<ADC *>> ADCs,
         std::shared_ptr<Logger> logger
 ) :
-        open(true), machine(machine), relays(relays), LCs(LCs), PTs(PTs), ADCs(ADCs), logger(logger) {
+        open(true), graph_count(0), graph_interval(1), machine(machine), relays(relays),
+        LCs(LCs), PTs(PTs), ADCs(ADCs), logger(logger) {
+
 
     setlocale(LC_ALL, "");
     initscr();
@@ -29,7 +31,25 @@ Display::Display(
     main_win = newwin(0, 0, 1, 1);
     top_win = newwin(0, 0, 2, 24);
     left_win = newwin(0, 0, 2, 3);
-    graph_win = newwin(0, 0, 12, 25);
+
+    graphs[0] = newwin((LINES - 14) / 2, (COLS - 27) / 2, 12, 24);
+    graphs[1] = newwin((LINES - 14) / 2, (COLS - 27) / 2, 12, 24 + (COLS - 25) / 2);
+    graphs[2] = newwin((LINES - 14) / 2, (COLS - 27) / 2, 12 + (LINES - 14) / 2, 24);
+    graphs[3] = newwin((LINES - 14) / 2, (COLS - 27) / 2, 12 + (LINES - 14) / 2, 24 + (COLS - 25) / 2);
+
+    // each source requires a pointer to an arbitrary float (can be a class member)
+    // examples:
+    // &((*PTs)[0]->*(&PT::pressure)) references the pressure of PT0
+    // &(((*ADCs)[0]->*(&ADC::values))[0]) references value 0 of ADC0
+    graph_srcs[0] = &(((*ADCs)[0]->*(&ADC::values))[0]);
+    graph_srcs[1] = &(((*ADCs)[0]->*(&ADC::values))[1]);
+    graph_srcs[2] = &(((*ADCs)[0]->*(&ADC::values))[2]);
+    graph_srcs[3] = &((*LCs)[0]->*(&LoadCell::weight));
+
+    for (int i = 0; i < 4; i++) {
+        std::deque<float> temp{0};
+        this->graph_bufs.push_back(temp);
+    }
 
     ungetch(KEY_RESIZE);
     hint = "PRESS s[afe] OR q[uit]";
@@ -76,7 +96,12 @@ void Display::update(bool update_now) {
             reinitwin(main_win, LINES - 2, COLS - 2, 1, 1);
             reinitwin(top_win, 10, COLS - 27, 2, 24);
             reinitwin(left_win, LINES - 4, 20, 2, 3);
-            reinitwin(graph_win, (LINES - 14) / 2, (COLS - 27) / 2, 12, 24);
+
+            reinitwin(graphs[0], (LINES - 14) / 2, (COLS - 27) / 2, 12, 24);
+            reinitwin(graphs[1], (LINES - 14) / 2, (COLS - 27) / 2, 12, 24 + (COLS - 25) / 2);
+            reinitwin(graphs[2], (LINES - 14) / 2, (COLS - 27) / 2, 12 + (LINES - 14) / 2, 24);
+            reinitwin(graphs[3], (LINES - 14) / 2, (COLS - 27) / 2, 12 + (LINES - 14) / 2, 24 + (COLS - 25) / 2);
+            graph_count=0;
             break;
         default:
             machine->update(ch);
@@ -85,7 +110,11 @@ void Display::update(bool update_now) {
 
     draw_state();
     draw_gauges();
-    draw_graphs();
+    if (graph_count==graph_interval) {
+        for (int i = 0; i < 4; i++) draw_graphs(i);
+        graph_count=0;
+    }
+    graph_count++;
 
     mvhline_set(0, 0, &space, COLS - 10);
 
@@ -134,55 +163,66 @@ void Display::draw_gauges() {
     mvwprintw(top_win, 7, 4, "P2: %f", (*PTs)[2]->pressure);
     mvwprintw(top_win, 8, 4, "T2: %f", (*PTs)[2]->temperature);
 
-    mvwprintw(top_win, 1, 18, "LC1: %f", (*LCs)[0]->get_weight());
+    mvwprintw(top_win, 1, 18, "LC0: %f", (*LCs)[0]->weight);
 
-    mvwprintw(top_win, 5, 18, "ADC0/0: %f", (*ADCs)[0]->values[0]);
-    mvwprintw(top_win, 6, 18, "ADC0/1: %f", (*ADCs)[0]->values[1]);
-    mvwprintw(top_win, 7, 18, "ADC0/2: %f", (*ADCs)[0]->values[2]);
-    mvwprintw(top_win, 8, 18, "ADC0/3: %f", (*ADCs)[0]->values[3]);
 
-    mvwprintw(top_win, 5, 35, "ADC1/0: %f", (*ADCs)[1]->values[0]);
-    mvwprintw(top_win, 6, 35, "ADC1/1: %f", (*ADCs)[1]->values[1]);
-    mvwprintw(top_win, 7, 35, "ADC1/2: %f", (*ADCs)[1]->values[2]);
-    mvwprintw(top_win, 8, 35, "ADC1/3: %f", (*ADCs)[1]->values[3]);
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 4; j++) {
+            mvwprintw(top_win, 5 + j, 18 + 20 * i, "ADC%d/%d: %5.0f", i, j, (*ADCs)[i]->values[j]);
+        }
+    }
 
     wrefresh(top_win);
 
 }
 
-void Display::draw_graphs() {
-
-    graph_buffer.push_back((*PTs)[0]->pressure);
-    while ((int) graph_buffer.size() > 2 * (getmaxx(graph_win) - 1)) { graph_buffer.pop_front(); }
+void Display::draw_graphs(int i) {
 
     int lookup_l[]{0x40, 0x4, 0x2, 0x1};
     int lookup_r[]{0x80, 0x20, 0x10, 0x8};
 
+    graph_bufs[i].push_back(*graph_srcs[i]);
+
+    while ((int) graph_bufs[i].size() > 2 * (getmaxx(graphs[i]) - 1)) {
+        graph_bufs[i].pop_front();
+    }
+
+
     cchar_t *c;
     c->attr = COLOR_PAIR(2);
-    int l, r;
-    float pr, pl, scale{10};
+    int l, r, height;
+    float pr, pl, max, min, scale;
+    werase(graphs[i]);
+
+    max = std::max(*std::max_element(graph_bufs[i].begin(), graph_bufs[i].end()), 0.0f);
+    min = std::min(*std::min_element(graph_bufs[i].begin(), graph_bufs[i].end()), 0.0f);
+
+    height = getmaxy(graphs[i]) - 2;
+    scale = std::min((float) (height - 1) / (max - min), 50.0f);
 
 
-    werase(graph_win);
-    for (int i = 0; i < (int) graph_buffer.size(); i += 2) {
-        pr = 1 + graph_buffer[i];
-        pl = 1 + graph_buffer[i + 1];
+    for (int j = 0; j < (int) graph_bufs[i].size()-1; j += 2) {
+        pl = graph_bufs[i][j] - min;
+        pr = graph_bufs[i][j + 1] - min;
+
         l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
         r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
-        if (std::fmod(pl, 1 / scale) == std::fmod(pr, 1 / scale)) {
+        if (std::floor(scale * pl) == std::floor(scale * pr)) {
             *(c->chars) = 0x2800 + l + r;
-            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pl - 1)), 2 + i / 2, c);
+            mvwadd_wch(graphs[i], height - (int) std::floor(scale * pl), 2 + j / 2, c);
         } else {
             *(c->chars) = 0x2800 + l;
-            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pl - 1)), 2 + i / 2, c);
+            mvwadd_wch(graphs[i], height - (int) std::floor(scale * pl), 2 + j / 2, c);
             *(c->chars) = 0x2800 + r;
-            mvwadd_wch(graph_win, 7 - (int) std::floor(scale * (pr - 1)), 2 + i / 2, c);
+            mvwadd_wch(graphs[i], height - (int) std::floor(scale * pr), 2 + j / 2, c);
         }
 
     }
-    box(graph_win, 0, 0);
-    wrefresh(graph_win);
+    mvwprintw(graphs[i], height - (int) std::floor(scale * (max - min)), 1, "%.2f", max);
+    mvwprintw(graphs[i], height, 1, "%.2f", min);
+
+    box(graphs[i], 0, 0);
+    wrefresh(graphs[i]);
 
 }
 
