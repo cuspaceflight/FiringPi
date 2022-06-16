@@ -1,9 +1,8 @@
 #include "LoadCell.hpp"
 
-LoadCell::LoadCell(int data, int clock) : DT(data), CLK(clock), k_filter(0.9) {
-    // TODO: Some error handling? idk
-
-    load_cell = std::make_unique<HX711::SimpleHX711>(data, clock, 1, 0, HX711::Rate::HZ_80);
+LoadCell::LoadCell(int data, int clock, HX71::Value refUnit, HX711::Value offset) :
+DT(data), CLK(clock), k_filter(0.9) {
+    load_cell = std::make_unique<HX711::SimpleHX711>(data, clock, refUnit, offset, HX711::Rate::HZ_80);
     //this->init();
 }
 

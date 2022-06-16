@@ -37,19 +37,19 @@ const bool StateMachine::transition_matrix[NUM_STATES][NUM_STATES]{
         //    INIT      SAFE             READY   FUEL FILL   OX FILL      CHILL       CHAM P    TANKS P     IGNITION    FIRING    SHUTDOWN    VENT        ABORT       ERROR       OFF
         {true,  true,  false, false, false, false, false, false, false, false, false, false, false, true,  true}, // INIT
         {false, true,  true,  false, false, false, false, false, false, false, false, false, false, true,  true}, // SAFE
-        {false, true,  true,  true,  true,  true,  true,  true, true, false, false, true, false, true, false}, // READY
-        {false, false, true, true,  false, false, false, false, false, false, false, false, false, true, false}, // F FILL
-        {false, false, true, false, true,  false, false, false, false, false, false, false, false,true , false}, // O FILL
-        {false, false, true, false, false, true,  false, false, false, false, false, false, false,true , false}, // CHILL
-        {false, false, true, false, false, false, true,  false, false, false, false, false, false,true , false}, // CHAM P
-        {false, false, true, false, false, false, false, true,  false, false, false, false, false,true , false}, // TANK P
-        {false, false, false, false, false, false, false, false, true,  true, false, false, true, false, false}, // IGNITION
-        {false, false, false, false, false, false, false, false, false, true,  true, false, true, false, false}, // FIRING
-        {false, false, true, false, false, false, false, false, false, false, true,  false, false, true, false}, // SHUTDOWN
-        {false, false, true, false, false, false, false, false, false, false, false, true,  false, true, false}, // VENT
-        {false, false, true, false, false, false, false, false, false, false, false, false, true,  true, false}, // ABORT
-        {false, false, true, false, false, false, false, false, false, false, false, false, false, true,  true}, // ERROR
-        {false, true, false, false, false, false, false, false, false, false, false, false, false, false, true} // OFF
+        {false, true,  true,  true,  true,  true,  true,  true,  true,  false, false, true,  false, true,  false}, // READY
+        {false, false, true,  true,  false, false, false, false, false, false, false, false, false, true,  false}, // F FILL
+        {false, false, true,  false, true,  false, false, false, false, false, false, false, false, true,  false}, // O FILL
+        {false, false, true,  false, false, true,  false, false, false, false, false, false, false, true,  false}, // CHILL
+        {false, false, true,  false, false, false, true,  false, false, false, false, false, false, true,  false}, // CHAM P
+        {false, false, true,  false, false, false, false, true,  false, false, false, false, false, true,  false}, // TANK P
+        {false, false, false, false, false, false, false, false, true,  true,  false, false, true,  false, false}, // IGNITION
+        {false, false, false, false, false, false, false, false, false, true,  true,  false, true,  false, false}, // FIRING
+        {false, false, true,  false, false, false, false, false, false, false, true,  false, false, true,  false}, // SHUTDOWN
+        {false, false, true,  false, false, false, false, false, false, false, false, true,  false, true,  false}, // VENT
+        {false, false, true,  false, false, false, false, false, false, false, false, false, true,  true,  false}, // ABORT
+        {false, false, true,  false, false, false, false, false, false, false, false, false, false, true,  true}, // ERROR
+        {false, true,  false, false, false, false, false, false, false, false, false, false, false, false, true} // OFF
 
 };
 
@@ -72,7 +72,7 @@ const int StateMachine::valve_matrix[NUM_STATES][NUM_VALVES]{
         {0, 0, 0, 0, 0, 0} // OFF
 };
 
-StateMachine::StateMachine(std::shared_ptr<Relay> valves, std::shared_ptr<Servo> servos)
+StateMachine::StateMachine(std::shared_ptr <Relay> valves, std::shared_ptr <Servo> servos)
         : state(INIT), valves(valves), servos(servos) {}
 
 bool StateMachine::canChangeTo(State next) const {
@@ -89,7 +89,7 @@ State StateMachine::update(int ch) {
             changeState(SAFE);
             break;
         case 'r':
-            if (state!=SAFE) changeState(READY);
+            if (state != SAFE) changeState(READY);
             break;
         case 'r' - 96:
             changeState(READY);
@@ -127,7 +127,7 @@ State StateMachine::update(int ch) {
         case 'e':
             changeState(ERROR);
             break;
-        case 'o'-96:
+        case 'o' - 96:
             changeState(OFF);
             break;
         default:
@@ -138,5 +138,15 @@ State StateMachine::update(int ch) {
 
 void StateMachine::process() const {
     valves->set_outputs(valve_matrix[state]);
+    servos->write_position(0, valve_matrix[state][0]*SERVO_OPEN);
+    switch (state) {
+        case INIT:
+            for (int i = 0; auto *LC: *LCs) i += (int) LC->init();
+            if (i==LCs->size()) changeState(SAFE);
+            else display->write_error("Check load cells");
+            break;
+        case default:
+            break
+    }
 
 }

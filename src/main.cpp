@@ -11,35 +11,30 @@
 #include "Servo.hpp"
 
 int main() {
-    auto PTs = std::make_shared<std::vector<PT*>>();
+    auto PTs = std::make_shared < std::vector < PT * >> ();
 
-    PTs->push_back(new PT(1, M32JM_ADDR, SAMPLING_FREQ));
-    PTs->push_back(new PT(3, M32JM_ADDR, 100));
-    PTs->push_back(new PT(4, M32JM_ADDR, SAMPLING_FREQ));
-    PTs->push_back(new PT(5, M32JM_ADDR, SAMPLING_FREQ));
-    PTs->push_back(new PT(6, 0x49, SAMPLING_FREQ));
+    PTs->push_back(new PT(1, M32JM_ADDR, SAMPLING_FREQ)); // PT0: Fuel tank
+    PTs->push_back(new PT(3, M32JM_ADDR, SAMPLING_FREQ)); // PT1: Ox tank
+    PTs->push_back(new PT(4, M32JM_ADDR, SAMPLING_FREQ)); // PT2: Fuel Manifold
+    PTs->push_back(new PT(5, M32JM_ADDR, SAMPLING_FREQ)); // PT3: Ox Manifold
+    PTs->push_back(new PT(6, M32JM_ADDR, SAMPLING_FREQ)); // PT4: Chamber
 
-    auto LCs = std::make_shared<std::vector<LoadCell*>>();
+    auto LCs = std::make_shared < std::vector < LoadCell * >> ();
 
-    LCs->push_back(new LoadCell(7,25));
+    LCs->push_back(new LoadCell(7, 25, LC0_REF_UNIT, LC0_OFFSET);  // Ox tank
+    LCs->push_back(new LoadCell(24, 18, LC1_REF_UNIT, LC1_OFFSET)); // Fuel tank
+    LCs->push_back(new LoadCell(15, 14, LC2_REF_UNIT, LC2_OFFSET)); // Thrust
 
-    auto ADCs = std::make_shared<std::vector<ADC*>>();
+    auto ADCs = std::make_shared < std::vector < ADC * >> ();
 
-    ADCs->push_back(new ADC(1,ADC0_ADDR,200));
-    ADCs->push_back(new ADC(3,ADC0_ADDR,200));
+    ADCs->push_back(new ADC(1, ADC0_ADDR, 200)); // ADC0: Thermocouples and LP water PTs
+    ADCs->push_back(new ADC(3, ADC0_ADDR, 200)); // ADC1: N/C
 
     auto relays = std::make_shared<Relay>();
-    auto servos = std::make_shared<Servo>(4, 40);
+    auto servos = std::make_shared<Servo>(4, 40); // Servo 1: He Valve
     auto machine = std::make_shared<StateMachine>(relays, servos);
-    auto logger = std::make_shared<Logger>(machine, relays, PTs);
+    auto logger = std::make_shared<Logger>(machine, relays, PTs, LCs);
     auto display = std::make_shared<Display>(machine, relays, PTs, LCs, ADCs, logger);
-
-    if ((*LCs)[0]->init()) {
-        machine->update('o');
-    } else {
-        machine->update('e');
-        display->write_error("Check load cell");
-    }
 
     while (display->open) {
         display->update();

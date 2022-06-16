@@ -28,9 +28,9 @@ void Servo::WriteReg(unsigned char reg, unsigned char data) {
     unsigned char buffer[2];
     buffer[0] = reg;
     buffer[1] = data;
-    int length = 2;
-    if ( write(file, buffer, length) != length ) {
-        std::cerr << "Failed to write to the i2c bus.\n" << std::endl;
+    if (write(file, buffer, 2) != 2) {
+        std::cerr << "Failed to write 0x" << std::hex << data <<
+        " to the servo driver register 0x" << std::hex << reg << ".\n" << std::endl;
     }
 }
 
@@ -70,7 +70,7 @@ void Servo::OutputOnTime(unsigned char chan, uint16_t time) {
     buffer[1] = time & 0x00FF;
     buffer[2] = time >> 8;
     int length = 3;
-    if ( write(file, buffer, length) != length ) {
+    if (write(file, buffer, length) != length) {
         std::cerr << "Failed to set servo on time.\n" << std::endl;
     }
 }
@@ -81,7 +81,7 @@ void Servo::OutputOffTime(unsigned char chan, uint16_t time) {
     buffer[1] = time & 0x00FF;
     buffer[2] = time >> 8;
     int length = 3;
-    if ( write(file, buffer, length) != length ) {
+    if (write(file, buffer, length) != length) {
         std::cerr << "Failed to set servo off time.\n" << std::endl;
     }
 }

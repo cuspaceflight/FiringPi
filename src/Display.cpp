@@ -84,6 +84,10 @@ void Display::update(bool update_now) {
                 for (auto *lc: *LCs) {
                     lc->kill();
                 }
+                for (auto *ADC: ADCs) {
+                    ADC->is_alive=false;
+                    ADC->thread_obj->join();
+                }
                 endwin();
                 exit(0);
             }

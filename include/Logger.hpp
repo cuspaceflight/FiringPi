@@ -46,7 +46,9 @@ private:
 public:
     Logger(std::shared_ptr<StateMachine> machine,
            std::shared_ptr<Relay> relays,
-           std::shared_ptr<std::vector<PT*>> pts);
+           std::shared_ptr<std::vector<PT*>> PTs,
+           std::shared_ptr<std::vector<LoadCell*>> LCs
+    );
     bool logging;
     std::thread* thread_obj;
 };
