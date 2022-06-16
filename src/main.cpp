@@ -14,8 +14,10 @@ int main() {
     auto PTs = std::make_shared<std::vector<PT*>>();
 
     PTs->push_back(new PT(1, M32JM_ADDR, SAMPLING_FREQ));
-    PTs->push_back(new PT(3, M32JM_ADDR, SAMPLING_FREQ));
+    PTs->push_back(new PT(3, M32JM_ADDR, 100));
     PTs->push_back(new PT(4, M32JM_ADDR, SAMPLING_FREQ));
+    PTs->push_back(new PT(5, M32JM_ADDR, SAMPLING_FREQ));
+    PTs->push_back(new PT(6, 0x49, SAMPLING_FREQ));
 
     auto LCs = std::make_shared<std::vector<LoadCell*>>();
 
@@ -23,8 +25,8 @@ int main() {
 
     auto ADCs = std::make_shared<std::vector<ADC*>>();
 
-    ADCs->push_back(new ADC(1,ADC0_ADDR,300));
-    ADCs->push_back(new ADC(3,ADC1_ADDR,300));
+    ADCs->push_back(new ADC(1,ADC0_ADDR,200));
+    ADCs->push_back(new ADC(3,ADC0_ADDR,200));
 
     auto relays = std::make_shared<Relay>();
     auto servos = std::make_shared<Servo>(4, 40);

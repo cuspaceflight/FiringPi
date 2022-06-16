@@ -1,7 +1,7 @@
 #include "../include/ADC.hpp"
 
 
-ADC::ADC(int bus, int addr, int freq) : freq(freq), values(), k_filter{0.01}, is_alive(true) {
+ADC::ADC(int bus, int addr, int freq) : freq(freq), values(), k_filter{1}, is_alive(true) {
     char filename[20];
 
     snprintf(filename, 19, "/dev/i2c-%d", bus);

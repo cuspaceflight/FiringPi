@@ -35,8 +35,8 @@ build without running `./pi -b`
 ## Using the Program {curly brackets mean TODO}
 
 Once you have launched the TUI successfully, you must launch the system into SAFE mode by pressing s[afe]. The system
-may be armed by pressing <CTRL-A>, then {once you are satisfied that the system has booted correctly,} STARTUP mode may
-be entered by pressing <SPACE>. The computer will then enter STARTUP, followed by FIRING and SHUTDOWN {as it runs the
+may be armed by pressing <CTRL-A>, then {once you are satisfied that the system has booted correctly,} IGNITION mode may
+be entered by pressing <SPACE>. The computer will then enter IGNITION, followed by FIRING and SHUTDOWN {as it runs the
 preconfigured fire sequence}. An ABORT may be triggered by pressing <BACKSPACE> {or automatically by the system
 detecting unsafe parameters}. ABORT mode can only be exitied by the computer, for safety reasons {currently press
 e[rror] to debug exit}. SHUTDOWN exits to SAFE, and ABORT exits to ERROR, from which SAFE mode can be entered by

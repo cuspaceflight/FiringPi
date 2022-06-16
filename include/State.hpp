@@ -12,10 +12,16 @@
 enum State {
     INIT,
     SAFE,
-    ARMED,
-    STARTUP,
+    READY,
+    F_FILL,
+    O_FILL,
+    CHILL,
+    P_TANKS,
+    P_CHAM,
+    IGNITION,
     FIRING,
     SHUTDOWN,
+    VENT,
     ABORT,
     ERROR,
     OFF,
@@ -44,10 +50,5 @@ private:
     std::chrono::time_point<std::chrono::system_clock> state_begin;
     static const bool transition_matrix[NUM_STATES][NUM_STATES];
 
-    const std::vector<std::array<int, NUM_VALVES>> *valve_matrix;
-
-    static const std::vector<std::array<int, NUM_VALVES>> IPA_cft_solenoids;
-    static const std::vector<std::array<int, NUM_VALVES>> N2O_cft_solenoids;
-    static const std::vector<std::array<int, NUM_VALVES>> H2O_cft_solenoids;
-
+    static const int valve_matrix[NUM_STATES][NUM_VALVES];
 };
