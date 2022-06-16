@@ -13,7 +13,7 @@ public:
 
     static void set_output(int output, int value);
 
-    static void set_outputs(const std::array<int, NUM_VALVES> *values);
+    static void set_outputs(const int values[NUM_VALVES]);
 
 private:
     static const int pins[NUM_VALVES];

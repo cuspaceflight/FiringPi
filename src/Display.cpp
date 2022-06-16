@@ -41,10 +41,10 @@ Display::Display(
     // examples:
     // &((*PTs)[0]->*(&PT::pressure)) references the pressure of PT0
     // &(((*ADCs)[0]->*(&ADC::values))[0]) references value 0 of ADC0
-    graph_srcs[0] = &(((*ADCs)[0]->*(&ADC::values))[0]);
-    graph_srcs[1] = &(((*ADCs)[0]->*(&ADC::values))[1]);
-    graph_srcs[2] = &(((*ADCs)[0]->*(&ADC::values))[2]);
-    graph_srcs[3] = &((*LCs)[0]->*(&LoadCell::weight));
+    graph_srcs[0] = &((*PTs)[0]->*(&PT::pressure));
+    graph_srcs[1] = &((*PTs)[1]->*(&PT::pressure));
+    graph_srcs[2] = &((*PTs)[2]->*(&PT::pressure));
+    graph_srcs[3] = &((*PTs)[3]->*(&PT::pressure));
 
     for (int i = 0; i < 4; i++) {
         std::deque<float> temp{0};
@@ -163,12 +163,18 @@ void Display::draw_gauges() {
     mvwprintw(top_win, 7, 4, "P2: %f", (*PTs)[2]->pressure);
     mvwprintw(top_win, 8, 4, "T2: %f", (*PTs)[2]->temperature);
 
-    mvwprintw(top_win, 1, 18, "LC0: %f", (*LCs)[0]->weight);
+    mvwprintw(top_win, 1, 24, "P3: %f", (*PTs)[3]->pressure);
+    mvwprintw(top_win, 2, 24, "T3: %f", (*PTs)[3]->temperature);
+
+    mvwprintw(top_win, 4, 24, "P4: %f", (*PTs)[4]->pressure);
+    mvwprintw(top_win, 5, 24, "T4: %f", (*PTs)[4]->temperature);
+
+    mvwprintw(top_win, 1, 44, "LC0: %f", (*LCs)[0]->weight);
 
 
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 4; j++) {
-            mvwprintw(top_win, 5 + j, 18 + 20 * i, "ADC%d/%d: %5.0f", i, j, (*ADCs)[i]->values[j]);
+            mvwprintw(top_win, 5 + j, 44 + 20 * i, "ADC%d/%d: %5.0f", i, j, (*ADCs)[i]->values[j]);
         }
     }
 

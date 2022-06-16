@@ -14,7 +14,7 @@ bool LoadCell::init() {
         is_alive = true;
 
         options.stratType=HX711::StrategyType::Samples;
-        options.samples=5;
+        options.samples=1; // change this for actual operation perhaps
 
         obj = std::make_unique<std::thread>(&LoadCell::loop, this);
         return true;
