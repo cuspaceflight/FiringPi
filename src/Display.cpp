@@ -12,6 +12,24 @@ const int Display::screens[][4]{
 
 };
 
+const char* Display::src_names[]{
+        "P0: Fuel tank",
+        "P1: Ox tank",
+        "P2: Fuel Manifold",
+        "P4: Chamber",
+        "T0: Fuel tank",
+        "T1: Ox tank",
+        "T2: Fuel Manifold",
+        "T3: Ox Manifold",
+        "T4: Chamber",
+        "ADC0/0",
+        "ADC0/1",
+        "ADC0/2",
+        "ADC0/3",
+        "LC0: Fuel Tank",
+        "LC1: Ox Tank",
+        "LC2: Thrust"
+}
 
 Display::Display(
         std::shared_ptr <StateMachine> machine,
@@ -73,7 +91,7 @@ Display::Display(
     graph_srcs[16] = &((*LCs)[2]->*(&LC::weight)); // Thrust
 
 
-    for (int i = 0; i < graph_srcs.size(); i++) {
+    for (int i = 0; i < NUM_SRCS; i++) {
         std::deque<float> temp{0};
         this->graph_bufs.push_back(temp);
     }
@@ -208,6 +226,8 @@ void Display::draw_gauges() {
     mvwprintw(top_win, 5, 24, "T4: %f", (*PTs)[4]->temperature);
 
     mvwprintw(top_win, 1, 44, "LC0: %f", (*LCs)[0]->weight);
+    mvwprintw(top_win, 2, 44, "LC1: %f", (*LCs)[1]->weight);
+    mvwprintw(top_win, 3, 44, "LC2: %f", (*LCs)[2]->weight);
 
 
     for (int i = 0; i < 2; i++) {
@@ -263,6 +283,7 @@ void Display::draw_graphs(int win, int src) {
     mvwprintw(graphs[win], height, 1, "%.2f", min);
 
     box(graphs[win], 0, 0);
+    mvwprintw(graphs[win], 0,1, src_names[data]);
     wrefresh(graphs[win]);
 
 }

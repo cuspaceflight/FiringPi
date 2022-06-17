@@ -16,16 +16,18 @@
 #include "LoadCell.hpp"
 #include "ADC.hpp"
 
+#define NUM_SRCS
+
 
 class Display {
 public:
     Display(
-            std::shared_ptr<StateMachine> machine,
-            std::shared_ptr<Relay> relays,
-            std::shared_ptr<std::vector<PT *>> PTs,
-            std::shared_ptr<std::vector<LoadCell *>> LCs,
-            std::shared_ptr<std::vector<ADC *>> ADCs,
-            std::shared_ptr<Logger> logger
+            std::shared_ptr <StateMachine> machine,
+            std::shared_ptr <Relay> relays,
+            std::shared_ptr <std::vector<PT *>> PTs,
+            std::shared_ptr <std::vector<LoadCell *>> LCs,
+            std::shared_ptr <std::vector<ADC *>> ADCs,
+            std::shared_ptr <Logger> logger
     );
 
     void update(bool update_now = false);
@@ -40,24 +42,25 @@ private:
     std::string hint;
     cchar_t space;
 
-    std::vector<std::deque<float>> graph_bufs;
+    std::vector <std::deque<float>> graph_bufs;
     WINDOW *main_win, *top_win, *left_win;
-    std::array<WINDOW *,4> graphs;
-    std::array<float *, 17> graph_srcs;
+    std::array<WINDOW *, 4> graphs;
+    std::array<float *, NUM_SRCS> graph_srcs;
     int graph_count, graph_interval;
 
-    std::shared_ptr<StateMachine> machine;
-    std::shared_ptr<Relay> relays;
-    std::shared_ptr<std::vector<LoadCell *>> LCs;
-    std::shared_ptr<std::vector<PT *>> PTs;
-    std::shared_ptr<std::vector<ADC *>> ADCs;
-    std::shared_ptr<Logger> logger;
+    std::shared_ptr <StateMachine> machine;
+    std::shared_ptr <Relay> relays;
+    std::shared_ptr <std::vector<LoadCell *>> LCs;
+    std::shared_ptr <std::vector<PT *>> PTs;
+    std::shared_ptr <std::vector<ADC *>> ADCs;
+    std::shared_ptr <Logger> logger;
 
-    std::chrono::time_point<std::chrono::system_clock> now, last;
+    std::chrono::time_point <std::chrono::system_clock> now, last;
 
     static const long target_diff = 1000000 / 60;
 
-    static const int screens[][4];
+    static const int screens[NUM_SRCS][4];
+    static const char *src_names[NUM_SRCS];
 
     static void reinitwin(WINDOW *win, int height, int width, int starty, int startx);
 
