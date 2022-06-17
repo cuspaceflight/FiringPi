@@ -31,6 +31,7 @@ public:
     void update(bool update_now = false);
 
     bool open;
+    int scr;
 
     void write_error(std::string message);
 
@@ -42,7 +43,7 @@ private:
     std::vector<std::deque<float>> graph_bufs;
     WINDOW *main_win, *top_win, *left_win;
     std::array<WINDOW *,4> graphs;
-    std::array<float *, 4> graph_srcs;
+    std::array<float *, 17> graph_srcs;
     int graph_count, graph_interval;
 
     std::shared_ptr<StateMachine> machine;
@@ -55,6 +56,8 @@ private:
     std::chrono::time_point<std::chrono::system_clock> now, last;
 
     static const long target_diff = 1000000 / 60;
+
+    static const int screens[][4];
 
     static void reinitwin(WINDOW *win, int height, int width, int starty, int startx);
 
