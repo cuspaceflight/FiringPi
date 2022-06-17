@@ -4,14 +4,14 @@
 const char *StateMachine::names[]{
         "INIT", "[S]AFE", "[^R]EADY", "[F]UEL FILL", "[O]X FILL", "C[H]ILL",
         "[C]HAMBER PRESS", "[T]ANKS PRESS", "[I]GNITION", "[_]FIRING", "[x]SHUTDOWN",
-        "[V]ENT", "[<-]ABORT", "[E]RROR", "[^O]FF"
+        "[V]ENT", "[<-]ABORT", "[E]RROR", "[^O]FF", "[^M]ANUAL"
 };
 
 // ncurses colors of states
 const int StateMachine::colors[]{
         10, 10, 11, 12, 12, 12,
         12, 12, 208, 208, 208,
-        220, 9, 9, 0
+        220, 9, 9, 0, 199
 };
 
 // permissible states accessible from a given state
@@ -34,22 +34,23 @@ const bool StateMachine::transition_matrix[NUM_STATES][NUM_STATES]{
 //        {false, true,  false, false, false, false, false, true,  true},  //ERROR
 //        {false, true,  false, false, false, false, false, false, true}   //OFF
         // ALL TRUE FOR DEBUG
-        //    INIT      SAFE             READY   FUEL FILL   OX FILL      CHILL       CHAM P    TANKS P     IGNITION    FIRING    SHUTDOWN    VENT        ABORT       ERROR       OFF
-        {true,  true,  false, false, false, false, false, false, false, false, false, false, false, true,  true}, // INIT
-        {false, true,  true,  false, false, false, false, false, false, false, false, false, false, true,  true}, // SAFE
-        {false, true,  true,  true,  true,  true,  true,  true,  true,  false, false, true,  false, true,  false}, // READY
-        {false, false, true,  true,  false, false, false, false, false, false, false, false, false, true,  false}, // F FILL
-        {false, false, true,  false, true,  false, false, false, false, false, false, false, false, true,  false}, // O FILL
-        {false, false, true,  false, false, true,  false, false, false, false, false, false, false, true,  false}, // CHILL
-        {false, false, true,  false, false, false, true,  false, false, false, false, false, false, true,  false}, // CHAM P
-        {false, false, true,  false, false, false, false, true,  false, false, false, false, false, true,  false}, // TANK P
-        {false, false, false, false, false, false, false, false, true,  true,  false, false, true,  false, false}, // IGNITION
-        {false, false, false, false, false, false, false, false, false, true,  true,  false, true,  false, false}, // FIRING
-        {false, false, true,  false, false, false, false, false, false, false, true,  false, false, true,  false}, // SHUTDOWN
-        {false, false, true,  false, false, false, false, false, false, false, false, true,  false, true,  false}, // VENT
-        {false, false, true,  false, false, false, false, false, false, false, false, false, true,  true,  false}, // ABORT
-        {false, false, true,  false, false, false, false, false, false, false, false, false, false, true,  true}, // ERROR
-        {false, true,  false, false, false, false, false, false, false, false, false, false, false, false, true} // OFF
+        //    INIT      SAFE             READY   FUEL FILL   OX FILL      CHILL       CHAM P    TANKS P     IGNITION    FIRING    SHUTDOWN    VENT        ABORT       ERROR       OFF   MANUAL
+        {true,  true,  false, false, false, false, false, false, false, false, false, false, false, true,  true,  true}, // INIT
+        {false, true,  true,  false, false, false, false, false, false, false, false, false, false, true,  true,  true}, // SAFE
+        {false, true,  true,  true,  true,  true,  true,  true,  true,  false, false, true,  false, true,  false, true}, // READY
+        {false, false, true,  true,  false, false, false, false, false, false, false, false, false, true,  false, true}, // F FILL
+        {false, false, true,  false, true,  false, false, false, false, false, false, false, false, true,  false, true}, // O FILL
+        {false, false, true,  false, false, true,  false, false, false, false, false, false, false, true,  false, true}, // CHILL
+        {false, false, true,  false, false, false, true,  false, false, false, false, false, false, true,  false, true}, // CHAM P
+        {false, false, true,  false, false, false, false, true,  false, false, false, false, false, true,  false, true}, // TANK P
+        {false, false, false, false, false, false, false, false, true,  true,  false, false, true,  false, false, true}, // IGNITION
+        {false, false, false, false, false, false, false, false, false, true,  true,  false, true,  false, false, true}, // FIRING
+        {false, false, true,  false, false, false, false, false, false, false, true,  false, false, true,  false, true}, // SHUTDOWN
+        {false, false, true,  false, false, false, false, false, false, false, false, true,  false, true,  false, true}, // VENT
+        {false, false, true,  false, false, false, false, false, false, false, false, false, true,  true,  false, true}, // ABORT
+        {false, false, true,  false, false, false, false, false, false, false, false, false, false, true,  true,  true}, // ERROR
+        {false, true,  false, false, false, false, false, false, false, false, false, false, false, false, true,  true}, // OFF
+        {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true} // OFF
 
 };
 
@@ -130,6 +131,15 @@ State StateMachine::update(int ch) {
         case 'o' - 96:
             changeState(OFF);
             break;
+        case 'm' - 96:
+            changeState(MANUAL);
+            break;
+        case '0':
+            if (state == MANUAL) servos->write_position(0, SERVO_OPEN - this->position);
+            break;
+        case '1','2', '3', '4', '5', '6':
+            if (state == MANUAL) valves->set_output(ch - '0', 1 - valves->get_ouput(ch - '0'));
+            break;
         default:
             break;
     }
@@ -137,15 +147,20 @@ State StateMachine::update(int ch) {
 }
 
 void StateMachine::process() const {
-    valves->set_outputs(valve_matrix[state]);
-    servos->write_position(0, valve_matrix[state][0]*SERVO_OPEN);
     switch (state) {
         case INIT:
             for (int i = 0; auto *LC: *LCs) i += (int) LC->init();
-            if (i==LCs->size()) changeState(SAFE);
+            if (i == LCs->size()) changeState(SAFE);
             else display->write_error("Check load cells");
+            valves->set_outputs(valve_matrix[state]);
+            servos->write_position(0, valve_matrix[state][0] * SERVO_OPEN);
             break;
-        case default:
+        case MANUAL:
+            break;
+        case
+        default:
+            valves->set_outputs(valve_matrix[state]);
+            servos->write_position(0, valve_matrix[state][0] * SERVO_OPEN);
             break
     }
 

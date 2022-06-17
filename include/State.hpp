@@ -25,6 +25,7 @@ enum State {
     ABORT,
     ERROR,
     OFF,
+    MANUAL,
     NUM_STATES
 };
 
