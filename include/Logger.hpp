@@ -8,6 +8,7 @@
 #include "State.hpp"
 #include "Relay.hpp"
 #include "PT.hpp"
+#include "LoadCell.hpp"
 #include <H5PacketTable.h>
 #include <iostream>
 #include <stdio.h>
@@ -25,7 +26,8 @@ private:
     
     std::shared_ptr<StateMachine> machine;
     std::shared_ptr<Relay> relays;
-    std::shared_ptr<std::vector<PT*>> pts;
+    std::shared_ptr<std::vector<PT*>> PTs;
+    std::shared_ptr<std::vector<LoadCell *>> LCs;
     std::chrono::time_point<std::chrono::system_clock> now, startime;
 
     herr_t err;     /* Return value from function calls */

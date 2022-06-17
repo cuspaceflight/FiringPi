@@ -5,7 +5,7 @@ Logger::Logger(
         std::shared_ptr <Relay> relays,
         std::shared_ptr <std::vector<PT *>> PTs,
         std::shared_ptr <std::vector<LoadCell *>> LCs)
-        : machine(machine), relays(relays), pts(pts), err(), ptable(), count(), logging(true) {
+        : machine(machine), relays(relays), PTs(PTs), err(), ptable(), count(), logging(true), LCs(LCs) {
 
     const std::chrono::time_point <std::chrono::system_clock> now{std::chrono::system_clock::now()};
     time_t rawtime;
@@ -44,7 +44,7 @@ Logger::Logger(
 
 void Logger::loop() {
     herr_t err;
-    char line[100];
+    char line[300];
     float data[11];
     while (this->logging) {
         std::chrono::time_point <std::chrono::system_clock> now = std::chrono::system_clock::now();
@@ -65,7 +65,7 @@ void Logger::loop() {
 //        err = this->timetable->AppendPacket(&diff);
 //        err = this->PTtables->AppendPacket(&(data[0]));
 
-        sprintf(line, "%05ld, %f, %f, %f, %f, %f, %f, %f, %f\n",
+        sprintf(line, "%05ld, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
                 diff, data[0], data[1], data[2], data[3], data[4],
                 data[5], data[6], data[7], data[8], data[9], data[10]);
 

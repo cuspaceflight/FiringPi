@@ -16,7 +16,7 @@
 #include "LoadCell.hpp"
 #include "ADC.hpp"
 
-#define NUM_SRCS
+#define NUM_SRCS 17
 
 
 class Display {
@@ -42,7 +42,7 @@ private:
     std::string hint;
     cchar_t space;
 
-    std::vector <std::deque<float>> graph_bufs;
+    std::vector<std::deque<float>> graph_bufs;
     WINDOW *main_win, *top_win, *left_win;
     std::array<WINDOW *, 4> graphs;
     std::array<float *, NUM_SRCS> graph_srcs;
@@ -68,6 +68,6 @@ private:
 
     void draw_gauges();
 
-    void draw_graphs(int i);
+    void draw_graphs(int win, int src);
 
 };

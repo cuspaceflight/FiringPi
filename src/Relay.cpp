@@ -12,7 +12,7 @@ Relay::Relay() {
     }
 }
 
-int Relay::get_output(int output) return { 1-digitalRead(pins[output]); }
+int Relay::get_output(int output) {return  (int)(1-digitalRead(pins[output])); }
 
 void Relay::set_output(int output, int value) { digitalWrite(pins[output],1-value); }
 

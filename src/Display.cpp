@@ -8,14 +8,16 @@ const int Display::screens[][4]{
         {0,  5,  14, 4}, // fuel tank pressure, tank temp, tank weight, chamber pressure
         {1,  6,  15, 4}, // ox tank pressure, tank temp, tank weight, chamber pressure
         {14, 15, 16, 4}, // ox weight, fuel weight, thrust, chamber pressure
-        {14, 15, 0,  1} // ox weight, fuel weight, ox pressure, fuel pressure
+        {14, 15, 0,  1}, // ox weight, fuel weight, ox pressure, fuel pressure
+        {10,11,12,13} // ADC0
 
 };
 
-const char* Display::src_names[]{
+const char *Display::src_names[]{
         "P0: Fuel tank",
         "P1: Ox tank",
         "P2: Fuel Manifold",
+        "P3: Ox Manifold",
         "P4: Chamber",
         "T0: Fuel tank",
         "T1: Ox tank",
@@ -29,18 +31,18 @@ const char* Display::src_names[]{
         "LC0: Fuel Tank",
         "LC1: Ox Tank",
         "LC2: Thrust"
-}
+};
 
 Display::Display(
-        std::shared_ptr <StateMachine> machine,
-        std::shared_ptr <Relay> relays,
-        std::shared_ptr <std::vector<PT *>> PTs,
-        std::shared_ptr <std::vector<LoadCell *>> LCs,
-        std::shared_ptr <std::vector<ADC *>> ADCs,
-        std::shared_ptr <Logger> logger
+        std::shared_ptr<StateMachine> machine,
+        std::shared_ptr<Relay> relays,
+        std::shared_ptr<std::vector<PT *>> PTs,
+        std::shared_ptr<std::vector<LoadCell *>> LCs,
+        std::shared_ptr<std::vector<ADC *>> ADCs,
+        std::shared_ptr<Logger> logger
 ) :
-        open(true), graph_count(0), graph_interval(1), machine(machine), relays(relays),
-        LCs(LCs), PTs(PTs), ADCs(ADCs), logger(logger), scr(0) {
+        open(true), scr(0), graph_count(0), graph_interval(1), machine(machine),
+        relays(relays), LCs(LCs), PTs(PTs), ADCs(ADCs), logger(logger) {
 
 
     setlocale(LC_ALL, "");
@@ -73,22 +75,22 @@ Display::Display(
     graph_srcs[1] = &((*PTs)[1]->*(&PT::pressure)); // P1: Ox tank
     graph_srcs[2] = &((*PTs)[2]->*(&PT::pressure)); // P2: Fuel Manifold
     graph_srcs[3] = &((*PTs)[3]->*(&PT::pressure)); // P3: Ox Manifold
-    graph_srcs[4] = &((*PTs)[3]->*(&PT::pressure)); // P4: Chamber
+    graph_srcs[4] = &((*PTs)[4]->*(&PT::pressure)); // P4: Chamber
 
-    graph_srcs[5] = &((*PTs)[0]->*(&PT::pressure)); // T0: Fuel tank
-    graph_srcs[6] = &((*PTs)[1]->*(&PT::pressure)); // T1: Ox tank
-    graph_srcs[7] = &((*PTs)[2]->*(&PT::pressure)); // T2: Fuel Manifold
-    graph_srcs[8] = &((*PTs)[3]->*(&PT::pressure)); // T3: Ox Manifold
-    graph_srcs[9] = &((*PTs)[3]->*(&PT::pressure)); // T4: Chamber
+    graph_srcs[5] = &((*PTs)[0]->*(&PT::temperature)); // T0: Fuel tank
+    graph_srcs[6] = &((*PTs)[1]->*(&PT::temperature)); // T1: Ox tank
+    graph_srcs[7] = &((*PTs)[2]->*(&PT::temperature)); // T2: Fuel Manifold
+    graph_srcs[8] = &((*PTs)[3]->*(&PT::temperature)); // T3: Ox Manifold
+    graph_srcs[9] = &((*PTs)[4]->*(&PT::temperature)); // T4: Chamber
 
     graph_srcs[10] = &(((*ADCs)[0]->*(&ADC::values))[0]);
     graph_srcs[11] = &(((*ADCs)[0]->*(&ADC::values))[1]);
     graph_srcs[12] = &(((*ADCs)[0]->*(&ADC::values))[2]);
     graph_srcs[13] = &(((*ADCs)[0]->*(&ADC::values))[3]);
 
-    graph_srcs[14] = &((*LCs)[0]->*(&LC::weight)); // Fuel tank
-    graph_srcs[15] = &((*LCs)[1]->*(&LC::weight)); // Ox tank
-    graph_srcs[16] = &((*LCs)[2]->*(&LC::weight)); // Thrust
+    graph_srcs[14] = &((*LCs)[0]->*(&LoadCell::weight)); // Fuel tank
+    graph_srcs[15] = &((*LCs)[1]->*(&LoadCell::weight)); // Ox tank
+    graph_srcs[16] = &((*LCs)[2]->*(&LoadCell::weight)); // Thrust
 
 
     for (int i = 0; i < NUM_SRCS; i++) {
@@ -129,7 +131,7 @@ void Display::update(bool update_now) {
                 for (auto *lc: *LCs) {
                     lc->kill();
                 }
-                for (auto *ADC: ADCs) {
+                for (auto *ADC: *ADCs) {
                     ADC->is_alive = false;
                     ADC->thread_obj->join();
                 }
@@ -138,11 +140,11 @@ void Display::update(bool update_now) {
             }
             hint = "MUST BE POWERED OFF TO EXIT: ENTER s[afe] STATE THEN PRESS o[ff], q[uit]";
             break;
-        case '[':
-            scr = (scr - 1 + screens.size()) % screens.size();
+        case 'j':
+            scr = (scr - 1 + NUM_SRCS) % NUM_SRCS;
             break;
-        case ']':
-            scr = (scr + 1) & screens.size();
+        case 'k':
+            scr = (scr + 1) % NUM_SRCS;
             break;
         case KEY_RESIZE:
             wclear(stdscr);
@@ -165,9 +167,11 @@ void Display::update(bool update_now) {
 
     draw_state();
     draw_gauges();
-    for (int src: graph_srcs) graph_bufs[src].push_back(*graph_srcs[src]);
+    for (int i = 0; i < NUM_SRCS; i++) graph_bufs[i].push_back(*(graph_srcs[i]));
     if (graph_count == graph_interval) {
-        for (int win = 0; int src: screens[scr]; win++) draw_graphs(win, src);
+        for (int win = 0; win < 4; win++) {
+            draw_graphs(win, screens[scr][win]);
+        }
         graph_count = 0;
     }
     graph_count++;
@@ -248,9 +252,9 @@ void Display::draw_graphs(int win, int src) {
     while ((int) graph_bufs[src].size() > 2 * (getmaxx(graphs[win]) - 1)) {
         graph_bufs[src].pop_front();
     }
+    cchar_t c;
+    wchar_t res;
 
-    cchar_t *c;
-    c->attr = COLOR_PAIR(2);
     int l, r, height;
     float pr, pl, max, min, scale;
     werase(graphs[win]);
@@ -269,13 +273,16 @@ void Display::draw_graphs(int win, int src) {
         l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
         r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
         if (std::floor(scale * pl) == std::floor(scale * pr)) {
-            *(c->chars) = 0x2800 + l + r;
-            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, c);
+            res = 0x2800 + r + l;
+            setcchar(&c, &res, A_NORMAL, COLOR_PAIR(2), nullptr);
+            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, &c);
         } else {
-            *(c->chars) = 0x2800 + l;
-            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, c);
-            *(c->chars) = 0x2800 + r;
-            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pr), 2 + j / 2, c);
+            res = 0x2800 + r + l;
+            setcchar(&c, &res, A_NORMAL, COLOR_PAIR(2), nullptr);
+            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, &c);
+            res = 0x2800 + r + l;
+            setcchar(&c, &res, A_NORMAL, COLOR_PAIR(2), nullptr);
+            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pr), 2 + j / 2, &c);
         }
 
     }
@@ -283,7 +290,7 @@ void Display::draw_graphs(int win, int src) {
     mvwprintw(graphs[win], height, 1, "%.2f", min);
 
     box(graphs[win], 0, 0);
-    mvwprintw(graphs[win], 0,1, src_names[data]);
+    mvwprintw(graphs[win], 0, 1, src_names[src]);
     wrefresh(graphs[win]);
 
 }

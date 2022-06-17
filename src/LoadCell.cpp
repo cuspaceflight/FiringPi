@@ -1,6 +1,6 @@
 #include "LoadCell.hpp"
 
-LoadCell::LoadCell(int data, int clock, HX71::Value refUnit, HX711::Value offset) :
+LoadCell::LoadCell(int data, int clock, HX711::Value refUnit, HX711::Value offset) :
 DT(data), CLK(clock), k_filter(0.9) {
     load_cell = std::make_unique<HX711::SimpleHX711>(data, clock, refUnit, offset, HX711::Rate::HZ_80);
     //this->init();

@@ -135,10 +135,10 @@ State StateMachine::update(int ch) {
             changeState(MANUAL);
             break;
         case '0':
-            if (state == MANUAL) servos->write_position(0, SERVO_OPEN - this->position);
+            if (state == MANUAL) servos->write_position(0, SERVO_OPEN - servos->position);
             break;
-        case '1','2', '3', '4', '5', '6':
-            if (state == MANUAL) valves->set_output(ch - '0', 1 - valves->get_ouput(ch - '0'));
+        case '1': case '2': case '3': case '4': case '5': case '6':
+            if (state == MANUAL) valves->set_output(ch - '0', 1 - valves->get_output((int)(ch - '0')));
             break;
         default:
             break;
@@ -149,19 +149,22 @@ State StateMachine::update(int ch) {
 void StateMachine::process() const {
     switch (state) {
         case INIT:
-            for (int i = 0; auto *LC: *LCs) i += (int) LC->init();
-            if (i == LCs->size()) changeState(SAFE);
-            else display->write_error("Check load cells");
+//            int i=0;
+//            for (auto *LC: *LCs) {
+//                i += (int) LC->init();
+//                i++;
+//            }
+//            if (i == LCs->size()) this->changeState(SAFE);
+////            else: display->write_error("Check load cells");
             valves->set_outputs(valve_matrix[state]);
             servos->write_position(0, valve_matrix[state][0] * SERVO_OPEN);
             break;
         case MANUAL:
             break;
-        case
         default:
             valves->set_outputs(valve_matrix[state]);
             servos->write_position(0, valve_matrix[state][0] * SERVO_OPEN);
-            break
+            break;
     }
 
 }

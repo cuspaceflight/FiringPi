@@ -15,9 +15,9 @@ extern "C" {
 #include <array>
 
 #define NUM_SERVOS 3
- 
+
 #define OSC_FREQ 25000000L
- /* Register address and bit positions/masks for the devices internal registers */
+/* Register address and bit positions/masks for the devices internal registers */
 #define MODE1 0x00
 #define MODE1_ALLCALL_BIT 0
 #define MODE1_ALLCALL_MASK ~(1 << MODE1_ALLCALL_BIT)
@@ -68,15 +68,22 @@ extern "C" {
 #define PRE_SCALE 0xFE
 
 class Servo {
-    private:
-        int position;
-        int file, freq, addr;
-        static const int channels[NUM_SERVOS];
-        void WriteReg(unsigned char reg, unsigned char data);
-        void OutputOnTime(unsigned char chan, uint16_t time);
-        void OutputOffTime(unsigned char chan, uint16_t time);
-    public:
-        Servo(int bus, int address);
-        void write_position(unsigned char chan, uint16_t Pos);
-        void write_positions(const std::array<uint16_t, NUM_SERVOS> *values);
+private:
+    int file, freq, addr;
+    static const int channels[NUM_SERVOS];
+
+    void WriteReg(unsigned char reg, unsigned char data);
+
+    void OutputOnTime(unsigned char chan, uint16_t time);
+
+    void OutputOffTime(unsigned char chan, uint16_t time);
+
+public:
+    Servo(int bus, int address);
+
+    int position;
+
+    void write_position(unsigned char chan, uint16_t Pos);
+
+    void write_positions(const std::array<uint16_t, NUM_SERVOS> *values);
 };

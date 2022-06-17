@@ -11,7 +11,7 @@ class Relay {
 public:
     Relay();
 
-    static int get_output(int output);
+    int get_output(int output);
 
     static void set_output(int output, int value);
 

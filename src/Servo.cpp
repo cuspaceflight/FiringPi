@@ -29,8 +29,8 @@ void Servo::WriteReg(unsigned char reg, unsigned char data) {
     buffer[0] = reg;
     buffer[1] = data;
     if (write(file, buffer, 2) != 2) {
-        std::cerr << "Failed to write 0x" << std::hex << data <<
-        " to the servo driver register 0x" << std::hex << reg << ".\n" << std::endl;
+        std::cerr << "Failed to write 0x" << std::hex << (int)data <<
+        " to the servo driver register 0x" << std::hex << (int)reg << ".\n" << std::endl;
     }
 }
 

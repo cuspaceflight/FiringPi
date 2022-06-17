@@ -9,7 +9,7 @@
 class LoadCell
 {
 public:
-    LoadCell(int data, int clock);
+    LoadCell(int data, int clock, HX711::Value refUnit, HX711::Value offset);
 
     float get_weight() const;
     bool init();
