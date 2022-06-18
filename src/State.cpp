@@ -131,7 +131,7 @@ State StateMachine::update(int ch) {
         case 'o' - 96:
             changeState(OFF);
             break;
-        case 'm' - 96:
+        case '#':
             changeState(MANUAL);
             break;
         case '0':
