@@ -1,6 +1,7 @@
 #include <Display.hpp>
 #include <chrono>
 #include <cstdlib>
+#include "../include/Display.hpp"
 
 
 const int Display::screens[][4]{
@@ -9,7 +10,7 @@ const int Display::screens[][4]{
         {1,  6,  15, 4}, // ox tank pressure, tank temp, tank weight, chamber pressure
         {14, 15, 16, 4}, // ox weight, fuel weight, thrust, chamber pressure
         {14, 15, 0,  1}, // ox weight, fuel weight, ox pressure, fuel pressure
-        {10,11,12,13} // ADC0
+        {10, 11, 12, 13} // ADC0
 
 };
 
@@ -34,12 +35,12 @@ const char *Display::src_names[]{
 };
 
 Display::Display(
-        std::shared_ptr<StateMachine> machine,
-        std::shared_ptr<Relay> relays,
-        std::shared_ptr<std::vector<PT *>> PTs,
-        std::shared_ptr<std::vector<LoadCell *>> LCs,
-        std::shared_ptr<std::vector<ADC *>> ADCs,
-        std::shared_ptr<Logger> logger
+        std::shared_ptr <StateMachine> machine,
+        std::shared_ptr <Relay> relays,
+        std::shared_ptr <std::vector<PT *>> PTs,
+        std::shared_ptr <std::vector<LoadCell *>> LCs,
+        std::shared_ptr <std::vector<ADC *>> ADCs,
+        std::shared_ptr <Logger> logger
 ) :
         open(true), scr(0), graph_count(0), graph_interval(1), machine(machine),
         relays(relays), LCs(LCs), PTs(PTs), ADCs(ADCs), logger(logger) {
@@ -140,10 +141,10 @@ void Display::update(bool update_now) {
             }
             hint = "MUST BE POWERED OFF TO EXIT: ENTER s[afe] STATE THEN PRESS o[ff], q[uit]";
             break;
-        case 'j':
+        case '[':
             scr = (scr - 1 + NUM_SRCS) % NUM_SRCS;
             break;
-        case 'k':
+        case ']':
             scr = (scr + 1) % NUM_SRCS;
             break;
         case KEY_RESIZE:
@@ -165,8 +166,9 @@ void Display::update(bool update_now) {
             break;
     }
 
-    draw_state();
     draw_gauges();
+    draw_state();
+
     for (int i = 0; i < NUM_SRCS; i++) graph_bufs[i].push_back(*(graph_srcs[i]));
     if (graph_count == graph_interval) {
         for (int win = 0; win < 4; win++) {
@@ -233,6 +235,10 @@ void Display::draw_gauges() {
     mvwprintw(top_win, 2, 44, "LC1: %f", (*LCs)[1]->weight);
     mvwprintw(top_win, 3, 44, "LC2: %f", (*LCs)[2]->weight);
 
+    for (int i = 0; i < 8; i++) {
+        mvwprintw(top_win, i + 1, 84, "%s: %d", Relay::channel_names[i], relays->get_output(i));
+    }
+
 
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 4; j++) {
@@ -266,6 +272,7 @@ void Display::draw_graphs(int win, int src) {
     scale = std::min((float) (height - 1) / (max - min), 50.0f);
 
 
+    wattron(graphs[win], COLOR_PAIR(75));
     for (int j = 0; j < (int) graph_bufs[src].size() - 1; j += 2) {
         pl = graph_bufs[src][j] - min;
         pr = graph_bufs[src][j + 1] - min;
@@ -273,19 +280,17 @@ void Display::draw_graphs(int win, int src) {
         l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
         r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
         if (std::floor(scale * pl) == std::floor(scale * pr)) {
-            res = 0x2800 + r + l;
-            setcchar(&c, &res, A_NORMAL, COLOR_PAIR(2), nullptr);
-            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, &c);
+            res = (wchar_t) (0x2800 + r + l);
+            mvwprintw(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, "%ls", &res);
         } else {
-            res = 0x2800 + r + l;
-            setcchar(&c, &res, A_NORMAL, COLOR_PAIR(2), nullptr);
-            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, &c);
-            res = 0x2800 + r + l;
-            setcchar(&c, &res, A_NORMAL, COLOR_PAIR(2), nullptr);
-            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pr), 2 + j / 2, &c);
+            res = 0x2800 + l;
+            mvwprintw(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, "%ls", &res);
+            res = 0x2800 + r;
+            mvwprintw(graphs[win], height - (int) std::floor(scale * pr), 2 + j / 2, "%ls", &res);
         }
 
     }
+    wattroff(graphs[win], COLOR_PAIR(75));
     mvwprintw(graphs[win], height - (int) std::floor(scale * (max - min)), 1, "%.2f", max);
     mvwprintw(graphs[win], height, 1, "%.2f", min);
 

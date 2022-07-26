@@ -13,10 +13,10 @@
 int main() {
     auto PTs = std::make_shared < std::vector < PT * >> ();
 
-    PTs->push_back(new PT(1, M32JM_ADDR, SAMPLING_FREQ)); // PT0: Fuel tank
-    PTs->push_back(new PT(3, M32JM_ADDR, SAMPLING_FREQ)); // PT1: Ox tank
-    PTs->push_back(new PT(4, M32JM_ADDR, SAMPLING_FREQ)); // PT2: Fuel Manifold
-    PTs->push_back(new PT(5, M32JM_ADDR, SAMPLING_FREQ)); // PT3: Ox Manifold
+    PTs->push_back(new PT(5, M32JM_ADDR, SAMPLING_FREQ)); // PT0: Fuel tank
+    PTs->push_back(new PT(1, M32JM_ADDR, SAMPLING_FREQ)); // PT1: Ox tank
+    PTs->push_back(new PT(3, M32JM_ADDR, SAMPLING_FREQ)); // PT2: Fuel Manifold
+    PTs->push_back(new PT(4, M32JM_ADDR, SAMPLING_FREQ)); // PT3: Ox Manifold
     PTs->push_back(new PT(6, M32JM_ADDR, SAMPLING_FREQ)); // PT4: Chamber
 
     auto LCs = std::make_shared < std::vector < LoadCell * >> ();
@@ -31,7 +31,7 @@ int main() {
     ADCs->push_back(new ADC(3, ADC0_ADDR, 200)); // ADC1: N/C
 
     auto relays = std::make_shared<Relay>();
-    auto servos = std::make_shared<Servo>(4, 40); // Servo 1: He Valve
+    auto servos = std::make_shared<Servo>(6, 40); // Servo 1: He Valve
     auto machine = std::make_shared<StateMachine>(relays, servos);
     auto logger = std::make_shared<Logger>(machine, relays, PTs, LCs);
     auto display = std::make_shared<Display>(machine, relays, PTs, LCs, ADCs, logger);

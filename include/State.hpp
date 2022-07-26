@@ -16,8 +16,8 @@ enum State {
     F_FILL,
     O_FILL,
     CHILL,
-    P_TANKS,
     P_CHAM,
+    P_TANKS,
     IGNITION,
     FIRING,
     SHUTDOWN,
@@ -39,11 +39,11 @@ public:
 
     void changeState(State next);
 
-    bool canChangeTo(State next) const;
+    bool canChangeTo(State next);
 
     State update(int ch);
 
-    void process() const;
+    void process();
 
 private:
     std::shared_ptr<Relay> valves;
@@ -51,5 +51,5 @@ private:
     std::chrono::time_point<std::chrono::system_clock> state_begin;
     static const bool transition_matrix[NUM_STATES][NUM_STATES];
 
-    static const int valve_matrix[NUM_STATES][NUM_VALVES];
+    static const int valve_matrix[NUM_STATES][N_CHANNELS];
 };
