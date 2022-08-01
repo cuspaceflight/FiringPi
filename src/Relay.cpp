@@ -29,6 +29,10 @@ void Relay::set_output(int output, int value) { digitalWrite(pins[output],1-valu
 
 void Relay::set_outputs(const int values[N_CHANNELS]) {
     for (int i = 0; i < N_CHANNELS; i++) {
-        digitalWrite(pins[i], 1 - values[i]);
+        if (i==1) { // this valve is normally open
+            digitalWrite(pins[i], values[i]);
+        } else {
+            digitalWrite(pins[i], 1 - values[i]);
+        }
     }
 }

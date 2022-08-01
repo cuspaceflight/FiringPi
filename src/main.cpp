@@ -22,8 +22,8 @@ int main() {
     auto LCs = std::make_shared < std::vector < LoadCell * >> ();
 
     LCs->push_back(new LoadCell(7, 25, LC0_REF_UNIT, LC0_OFFSET));   // Fuel tank
-    LCs->push_back(new LoadCell(24, 18, LC1_REF_UNIT, LC1_OFFSET)); // Ox tank
-    LCs->push_back(new LoadCell(15, 14, LC2_REF_UNIT, LC2_OFFSET)); // Thrust
+    LCs->push_back(new LoadCell(24, 18, LC1_REF_UNIT, LC1_OFFSET)); // Ox tank TODO remove
+    LCs->push_back(new LoadCell(15, 14, LC2_REF_UNIT, LC2_OFFSET)); // Thrust TODO remove
 
     auto ADCs = std::make_shared < std::vector < ADC * >> ();
 

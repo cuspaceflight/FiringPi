@@ -28,7 +28,7 @@ private:
     std::shared_ptr<Relay> relays;
     std::shared_ptr<std::vector<PT*>> PTs;
     std::shared_ptr<std::vector<LoadCell *>> LCs;
-    std::chrono::time_point<std::chrono::system_clock> now, startime;
+    std::chrono::time_point<std::chrono::system_clock> now, starttime;
 
     herr_t err;     /* Return value from function calls */
     hid_t fid;   /* HDF5 identifier for file */

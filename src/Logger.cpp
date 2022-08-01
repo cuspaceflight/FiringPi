@@ -21,7 +21,7 @@ Logger::Logger(
     // Find run no
     glob_t gstruct;
     strftime(date, 14, "%d-%m-%Y", timeinfo);
-//    sprintf(fname, "/home/cusf/FiringPi/out/%s_*.h5", date);
+    sprintf(fname, "/home/cusf/FiringPi/out/%s_*.csv", date);
     glob(fname, GLOB_ERR, NULL, &gstruct);
 
     // Generate filename
@@ -32,12 +32,12 @@ Logger::Logger(
 
     // Open files and set up HDF5 packet tables
     this->log_csv.open(fname);
-    (this->log_csv) << "T (ms), P0, T0, P1 , T1, P2, T2, P3, T3, LC1, LC2, LC3\n";
+    (this->log_csv) << "T (ms), P0, T0, P1 , T1, P2, T2, P3, T3, P4, T4, LC0\n";
 //    this->timetable = new FL_PacketTable(this->fid, "/T", H5T_NATIVE_INT, 1, H5P_DEFAULT);
 //    sprintf(tname, "/PT_%d", 1);
 //    this->PTtables = new FL_PacketTable(this->fid, "/P_1", H5T_NATIVE_FLOAT, 1, H5P_DEFAULT);
 
-    this->startime = std::chrono::system_clock::now();
+    this->starttime = std::chrono::system_clock::now();
     this->thread_obj = new std::thread(&Logger::loop, this);
 
 }
@@ -48,24 +48,25 @@ void Logger::loop() {
     float data[11];
     while (this->logging) {
         std::chrono::time_point <std::chrono::system_clock> now = std::chrono::system_clock::now();
-        long diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->startime).count();
+        long diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->starttime).count();
 
         data[0] = (*PTs)[0]->pressure;
         data[1] = (*PTs)[0]->temperature;
         data[2] = (*PTs)[1]->pressure;
-        data[3] = (*PTs)[1]->pressure;
+        data[3] = (*PTs)[1]->temperature;
         data[4] = (*PTs)[2]->pressure;
         data[5] = (*PTs)[2]->temperature;
-        data[6] = (*PTs)[3]->temperature;
+        data[6] = (*PTs)[3]->pressure;
         data[7] = (*PTs)[3]->temperature;
+        data[8] = (*PTs)[4]->pressure;
+        data[9] = (*PTs)[4]->temperature;
 
-        data[8] = (*LCs)[0]->weight;
-        data[9] = (*LCs)[1]->weight;
-        data[10] = (*LCs)[2]->weight;
+        data[10] = (*LCs)[0]->weight;
+
 //        err = this->timetable->AppendPacket(&diff);
 //        err = this->PTtables->AppendPacket(&(data[0]));
 
-        sprintf(line, "%05ld, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
+        sprintf(line, "%06ld, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
                 diff, data[0], data[1], data[2], data[3], data[4],
                 data[5], data[6], data[7], data[8], data[9], data[10]);
 
