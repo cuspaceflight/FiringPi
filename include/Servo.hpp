@@ -74,6 +74,8 @@ private:
 
     void WriteReg(unsigned char reg, unsigned char data);
 
+    unsigned char ReadReg(void *reg);
+
     void OutputOnTime(unsigned char chan, uint16_t time);
 
     void OutputOffTime(unsigned char chan, uint16_t time);

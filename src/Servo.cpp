@@ -22,6 +22,14 @@ Servo::Servo(int bus, int address) : addr(address) {
     unsigned char data = (OSC_FREQ / (4096L * SERVO_FREQ)) - 1;
     WriteReg(PRE_SCALE, data);
 
+    // Set auto increment
+
+    {
+        unsigned char Data = ReadReg(MODE1);
+        Data = (Data & MODE1_AI_MASK) | (Mode << MODE1_AI_BIT);
+        WriteReg(MODE1, Data);
+    }
+
 }
 
 void Servo::WriteReg(unsigned char reg, unsigned char data) {
@@ -32,6 +40,15 @@ void Servo::WriteReg(unsigned char reg, unsigned char data) {
         std::cerr << "Failed to write 0x" << std::hex << (int)data <<
         " to the servo driver register 0x" << std::hex << (int)reg << ".\n" << std::endl;
     }
+}
+
+unsigned char Servo::ReadReg(void *reg) {
+    if (read(file, reg, 1) != 1 ) {
+        std::cerr << "Failed to read from register 0x" << (int) std::hex << reg <<".\n" << std::endl;
+    } else {
+        return (unsigned char) reg;
+    }
+
 }
 
 /* Sets position of servo
