@@ -20,6 +20,8 @@ private:
     // Data and clock pins
     const int DT,CLK;
     float k_filter;
+    float grad;
+    float offset;
     std::unique_ptr<HX711::SimpleHX711> load_cell;
     std::unique_ptr<std::thread> obj;
     HX711::Options options;

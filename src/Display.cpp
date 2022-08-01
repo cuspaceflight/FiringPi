@@ -1,16 +1,14 @@
 #include <Display.hpp>
 #include <chrono>
 #include <cstdlib>
+#include "../include/Display.hpp"
 
 
 const int Display::screens[][4]{
-        {0,  1,  5,  6}, // fuel and ox tank pressure & temp
-        {0,  5,  14, 4}, // fuel tank pressure, tank temp, tank weight, chamber pressure
-        {1,  6,  15, 4}, // ox tank pressure, tank temp, tank weight, chamber pressure
-        {14, 15, 16, 4}, // ox weight, fuel weight, thrust, chamber pressure
-        {14, 15, 0,  1}, // ox weight, fuel weight, ox pressure, fuel pressure
-        {10,11,12,13} // ADC0
-
+        {0, 1, 5, 6},
+        {2, 3, 4, 16},
+        {5, 6, 7, 8},
+        {0, 5, 1, 6}
 };
 
 const char *Display::src_names[]{
@@ -29,17 +27,17 @@ const char *Display::src_names[]{
         "ADC0/2",
         "ADC0/3",
         "LC0: Fuel Tank",
-        "LC1: Ox Tank",
-        "LC2: Thrust"
+        "LC1: Ox Tank", // TODO REMOVE
+        "LC2: Thrust"   // TODO REMOVE
 };
 
 Display::Display(
-        std::shared_ptr<StateMachine> machine,
-        std::shared_ptr<Relay> relays,
-        std::shared_ptr<std::vector<PT *>> PTs,
-        std::shared_ptr<std::vector<LoadCell *>> LCs,
-        std::shared_ptr<std::vector<ADC *>> ADCs,
-        std::shared_ptr<Logger> logger
+        std::shared_ptr <StateMachine> machine,
+        std::shared_ptr <Relay> relays,
+        std::shared_ptr <std::vector<PT *>> PTs,
+        std::shared_ptr <std::vector<LoadCell *>> LCs,
+        std::shared_ptr <std::vector<ADC *>> ADCs,
+        std::shared_ptr <Logger> logger
 ) :
         open(true), scr(0), graph_count(0), graph_interval(1), machine(machine),
         relays(relays), LCs(LCs), PTs(PTs), ADCs(ADCs), logger(logger) {
@@ -89,8 +87,8 @@ Display::Display(
     graph_srcs[13] = &(((*ADCs)[0]->*(&ADC::values))[3]);
 
     graph_srcs[14] = &((*LCs)[0]->*(&LoadCell::weight)); // Fuel tank
-    graph_srcs[15] = &((*LCs)[1]->*(&LoadCell::weight)); // Ox tank
-    graph_srcs[16] = &((*LCs)[2]->*(&LoadCell::weight)); // Thrust
+    graph_srcs[15] = &((*LCs)[1]->*(&LoadCell::weight)); // Ox tank TODO REMOVE
+    graph_srcs[16] = &((*LCs)[2]->*(&LoadCell::weight)); // Thrust  TODO REMOVE
 
 
     for (int i = 0; i < NUM_SRCS; i++) {
@@ -140,11 +138,11 @@ void Display::update(bool update_now) {
             }
             hint = "MUST BE POWERED OFF TO EXIT: ENTER s[afe] STATE THEN PRESS o[ff], q[uit]";
             break;
-        case 'j':
-            scr = (scr - 1 + NUM_SRCS) % NUM_SRCS;
+        case '[':
+            scr = (scr - 1 + NUM_SCREENS) % NUM_SCREENS;
             break;
-        case 'k':
-            scr = (scr + 1) % NUM_SRCS;
+        case ']':
+            scr = (scr + 1) % NUM_SCREENS;
             break;
         case KEY_RESIZE:
             wclear(stdscr);
@@ -165,8 +163,9 @@ void Display::update(bool update_now) {
             break;
     }
 
-    draw_state();
     draw_gauges();
+    draw_state();
+
     for (int i = 0; i < NUM_SRCS; i++) graph_bufs[i].push_back(*(graph_srcs[i]));
     if (graph_count == graph_interval) {
         for (int win = 0; win < 4; win++) {
@@ -214,24 +213,28 @@ void Display::draw_state() {
 }
 
 void Display::draw_gauges() {
-    mvwprintw(top_win, 1, 4, "P0: %f", (*PTs)[0]->pressure);
-    mvwprintw(top_win, 2, 4, "T0: %f", (*PTs)[0]->temperature);
+    mvwprintw(top_win, 1, 4, "P0: %f bar", (*PTs)[0]->pressure);
+    mvwprintw(top_win, 2, 4, "T0: %f deg", (*PTs)[0]->temperature);
 
-    mvwprintw(top_win, 4, 4, "P1: %f", (*PTs)[1]->pressure);
-    mvwprintw(top_win, 5, 4, "T1: %f", (*PTs)[1]->temperature);
+    mvwprintw(top_win, 4, 4, "P1: %f bar", (*PTs)[1]->pressure);
+    mvwprintw(top_win, 5, 4, "T1: %f deg", (*PTs)[1]->temperature);
 
-    mvwprintw(top_win, 7, 4, "P2: %f", (*PTs)[2]->pressure);
-    mvwprintw(top_win, 8, 4, "T2: %f", (*PTs)[2]->temperature);
+    mvwprintw(top_win, 7, 4, "P2: %f bar", (*PTs)[2]->pressure);
+    mvwprintw(top_win, 8, 4, "T2: %f deg", (*PTs)[2]->temperature);
 
-    mvwprintw(top_win, 1, 24, "P3: %f", (*PTs)[3]->pressure);
-    mvwprintw(top_win, 2, 24, "T3: %f", (*PTs)[3]->temperature);
+    mvwprintw(top_win, 1, 24, "P3: %f bar", (*PTs)[3]->pressure);
+    mvwprintw(top_win, 2, 24, "T3: %f deg", (*PTs)[3]->temperature);
 
-    mvwprintw(top_win, 4, 24, "P4: %f", (*PTs)[4]->pressure);
-    mvwprintw(top_win, 5, 24, "T4: %f", (*PTs)[4]->temperature);
+    mvwprintw(top_win, 4, 24, "P4: %f bar", (*PTs)[4]->pressure);
+    mvwprintw(top_win, 5, 24, "T4: %f deg", (*PTs)[4]->temperature);
 
-    mvwprintw(top_win, 1, 44, "LC0: %f", (*LCs)[0]->weight);
-    mvwprintw(top_win, 2, 44, "LC1: %f", (*LCs)[1]->weight);
-    mvwprintw(top_win, 3, 44, "LC2: %f", (*LCs)[2]->weight);
+    mvwprintw(top_win, 1, 44, "LC0: %f N", (*LCs)[0]->get_weight()); // TODO NEW
+    mvwprintw(top_win, 2, 44, "LC1: %f", (*LCs)[1]->weight); // TODO REMOVE
+    mvwprintw(top_win, 3, 44, "LC2: %f", (*LCs)[2]->weight); // TODO REMOVE
+
+    for (int i = 0; i < 8; i++) {
+        mvwprintw(top_win, i + 1, 84, "%s: %d", Relay::channel_names[i], relays->get_output(i));
+    }
 
 
     for (int i = 0; i < 2; i++) {
@@ -239,6 +242,8 @@ void Display::draw_gauges() {
             mvwprintw(top_win, 5 + j, 44 + 20 * i, "ADC%d/%d: %5.0f", i, j, (*ADCs)[i]->values[j]);
         }
     }
+
+    mvwprintw(top_win, 1, 64, "View: %d", scr);
 
     wrefresh(top_win);
 
@@ -266,6 +271,7 @@ void Display::draw_graphs(int win, int src) {
     scale = std::min((float) (height - 1) / (max - min), 50.0f);
 
 
+    wattron(graphs[win], COLOR_PAIR(75));
     for (int j = 0; j < (int) graph_bufs[src].size() - 1; j += 2) {
         pl = graph_bufs[src][j] - min;
         pr = graph_bufs[src][j + 1] - min;
@@ -273,19 +279,17 @@ void Display::draw_graphs(int win, int src) {
         l = lookup_l[(int) std::fmod(pl / (0.25 / scale), 4)];
         r = lookup_r[(int) std::fmod(pr / (0.25 / scale), 4)];
         if (std::floor(scale * pl) == std::floor(scale * pr)) {
-            res = 0x2800 + r + l;
-            setcchar(&c, &res, A_NORMAL, COLOR_PAIR(2), nullptr);
-            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, &c);
+            res = (wchar_t) (0x2800 + r + l);
+            mvwprintw(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, "%ls", &res);
         } else {
-            res = 0x2800 + r + l;
-            setcchar(&c, &res, A_NORMAL, COLOR_PAIR(2), nullptr);
-            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, &c);
-            res = 0x2800 + r + l;
-            setcchar(&c, &res, A_NORMAL, COLOR_PAIR(2), nullptr);
-            mvwadd_wch(graphs[win], height - (int) std::floor(scale * pr), 2 + j / 2, &c);
+            res = 0x2800 + l;
+            mvwprintw(graphs[win], height - (int) std::floor(scale * pl), 2 + j / 2, "%ls", &res);
+            res = 0x2800 + r;
+            mvwprintw(graphs[win], height - (int) std::floor(scale * pr), 2 + j / 2, "%ls", &res);
         }
 
     }
+    wattroff(graphs[win], COLOR_PAIR(75));
     mvwprintw(graphs[win], height - (int) std::floor(scale * (max - min)), 1, "%.2f", max);
     mvwprintw(graphs[win], height, 1, "%.2f", min);
 
