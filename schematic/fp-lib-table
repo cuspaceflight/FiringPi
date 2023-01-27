@@ -1,0 +1,5 @@
+(fp_lib_table
+  (lib (name "HX711")(type "KiCad")(uri "${KIPRJMOD}/Libraries/footprints/HX711.pretty")(options "")(descr ""))
+  (lib (name "PE-54038SNL")(type "KiCad")(uri "${KIPRJMOD}/Libraries/footprints/PE-54038SNL.pretty")(options "")(descr ""))
+  (lib (name "MMBT4403")(type "KiCad")(uri "${KIPRJMOD}/Libraries/footprints/MMBT4403.pretty")(options "")(descr ""))
+)

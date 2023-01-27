@@ -1,2 +1,4 @@
 (sym_lib_table
+  (lib (name "HX711")(type "KiCad")(uri "${KIPRJMOD}/Libraries/symbols/HX711.kicad_sym")(options "")(descr ""))
+  (lib (name "MMBT4403")(type "KiCad")(uri "${KIPRJMOD}/Libraries/symbols/MMBT4403.kicad_sym")(options "")(descr ""))
 )
