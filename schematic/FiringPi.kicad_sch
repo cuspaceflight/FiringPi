@@ -4866,7 +4866,7 @@
     (property "Reference" "R15" (id 0) (at 370.586 133.1503 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "400R" (id 1) (at 370.586 135.6872 0)
+    (property "Value" "430R" (id 1) (at 370.586 135.6872 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (id 2) (at 368.935 133.985 0)
@@ -5053,7 +5053,7 @@
     (property "Reference" "R16" (id 0) (at 370.586 196.6503 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "400R" (id 1) (at 370.586 199.1872 0)
+    (property "Value" "430R" (id 1) (at 370.586 199.1872 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (id 2) (at 368.935 197.485 0)
@@ -6403,7 +6403,7 @@
     (property "Value" "10u" (id 1) (at 62.0141 234.7535 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Capacitor_SMD:C_0805_2012Metric" (id 2) (at 59.69 233.045 0)
+    (property "Footprint" "Capacitor_SMD:C_0603_1608Metric" (id 2) (at 59.69 233.045 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 59.69 233.045 0)
@@ -6963,7 +6963,7 @@
       (reference "C3") (unit 1) (value "100n") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/b894b86d-6e34-4772-9865-998f9ce03312"
-      (reference "C4") (unit 1) (value "10u") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C4") (unit 1) (value "10u") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/b3bcc8e3-5bf0-4afc-8b06-0bf5e285ff36"
       (reference "C5") (unit 1) (value "100n") (footprint "Capacitor_SMD:C_0603_1608Metric")
@@ -7116,10 +7116,10 @@
       (reference "R14") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/144c7872-6df8-48e2-9e72-dab5128a4fa7"
-      (reference "R15") (unit 1) (value "400R") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R15") (unit 1) (value "430R") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/29640681-c3df-41d7-b0d0-925ecb8db18e"
-      (reference "R16") (unit 1) (value "400R") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R16") (unit 1) (value "430R") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/c4172d89-4355-49d4-91b2-3c9127c62b8f"
       (reference "R17") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
