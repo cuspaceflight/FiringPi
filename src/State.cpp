@@ -75,8 +75,8 @@ const int StateMachine::valve_matrix[NUM_STATES][N_CHANNELS]{
         {0, 0, 0, 0, 0, 0, 0, 0} // OFF
 };
 
-StateMachine::StateMachine(std::shared_ptr <Relay> valves, std::shared_ptr <Servo> servos)
-        : state(INIT), valves(valves), servos(servos) {}
+StateMachine::StateMachine(std::shared_ptr <Relay> valves)
+        : state(INIT), valves(valves) {}
 
 bool StateMachine::canChangeTo(State next) {
     return transition_matrix[state][next];
