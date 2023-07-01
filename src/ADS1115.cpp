@@ -1,14 +1,12 @@
 #include "../include/ADS1115.hpp"
 
-ADS1115::ADS1115(uint8_t bus, uint8_t address, bool* hold) : fd_(-1), bus_(bus), address_(address), hold(hold)
+ADS1115::ADS1115(uint8_t bus, uint8_t address) : fd_(-1), bus_(bus), address_(address)
 {
 
 }
 
 void ADS1115::reset(void)
 {
-    while(*hold) {}
-    *hold = true;
     setAddr();
     uint8_t buf[1];
     buf[1] = 0x06;
@@ -16,7 +14,6 @@ void ADS1115::reset(void)
     {
         std::cerr << "reset failed." << std::endl;
     }
-    *hold = false;
 }
 
 bool ADS1115::initialize()
@@ -30,6 +27,8 @@ bool ADS1115::initialize()
         return false;
     }
 
+
+    std::cerr << "ADS before reset" << std::endl;
     reset();
     uint16_t cfg = readRegister(ADS1115_REG_CONFIG);
     std::cerr << "reset config:" << std::hex << cfg << std::endl;
@@ -44,22 +43,6 @@ bool ADS1115::initialize()
     return true;
 }
 
-int16_t ADS1115::readConversion()
-{
-    if (ioctl(fd_, I2C_SLAVE, address_) < 0)
-    {
-        std::cerr << "Failed to set the I2C slave address." << std::endl;
-    }
-    uint8_t buf[2];
-    if (read(fd_, buf, 2) != 2)
-    {
-        std::cerr << "Failed to read conversion result." << std::endl;
-        return -1;
-    }
-    int16_t value = (buf[0] << 8) | buf[1];
-    return value;
-}
-
 
 bool ADS1115::setAddr(void)
 {
@@ -72,12 +55,12 @@ bool ADS1115::setAddr(void)
     {
         return true;
     }
+    std::cerr << "ADS setAddr" << std::endl;
+
 }
 
 bool ADS1115::writeRegister(uint8_t reg, uint16_t data)
 {
-    while(*hold) {}
-    *hold = true;
     setAddr();
     uint8_t buf[3];
     buf[0] = reg;
@@ -86,33 +69,27 @@ bool ADS1115::writeRegister(uint8_t reg, uint16_t data)
     if (write(fd_, buf, 3) != 3)
     {
         std::cerr << "writeRegister failed." << std::endl;
-        *hold = false;
         return false;
     }
     else
     {
-        *hold = false;
         return true;
     }
 }
 
 uint16_t ADS1115::readRegister(uint8_t reg)
-{    
-    while(*hold) {}
-    *hold = true;
+{   
     setAddr();
     uint8_t buf[2];
     buf[0] = reg;
     if (write(fd_, buf, 1) != 1)
     {
         std::cerr << "selecting register to read failed." << std::endl;
-        *hold = false;
         return false;
     }
     if (read(fd_, buf, 2) != 2)
     {
         std::cerr << "readRegister failed." << std::endl;
-        *hold = false;
         return -1;
     }
     uint16_t value = (buf[0] << 8) | buf[1];

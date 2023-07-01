@@ -45,7 +45,8 @@
 class ADS1115
 {
 public:
-    ADS1115(uint8_t bus, uint8_t address, bool* hold);
+    ADS1115(uint8_t bus, uint8_t address);
+    ADS1115();
     bool initialize();
     int16_t readConversion(void);
     uint16_t getConfig(void);
@@ -59,7 +60,6 @@ private:
     uint16_t config;
     uint8_t bus_;
     uint8_t address_;
-    bool* hold;
     bool setAddr(void);
     bool writeRegister(uint8_t reg, uint16_t data);
     uint16_t readRegister(uint8_t reg);

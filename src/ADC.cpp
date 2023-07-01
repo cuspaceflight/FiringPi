@@ -1,7 +1,7 @@
 #include "../include/ADC.hpp"
 
 
-ADC::ADC(uint8_t bus, uint8_t address, int freq, bool* hold) : bus(bus), address(address), freq(freq), hold(hold), values(), k_filter{1}, is_alive(true), ads(bus, address, hold)
+ADC::ADC(uint8_t bus, uint8_t address, int freq) : bus(bus), address(address), freq(freq), values(), k_filter{1}, is_alive(true), ads(bus, address)
 {
     // char filename[20];
 
@@ -22,6 +22,7 @@ ADC::ADC(uint8_t bus, uint8_t address, int freq, bool* hold) : bus(bus), address
     if (!ads.initialize())
     {
         
+        std::cerr << "before ADC init in ACC" << std::endl;
         std::cerr << "initialise ADS1115 " << std::endl;
     }
     this->thread_obj = new std::thread(&ADC::loop, this);

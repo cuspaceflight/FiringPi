@@ -34,11 +34,11 @@ Display::Display(
         std::shared_ptr <Relay> relays,
         std::shared_ptr <std::vector<PT *>> PTs,
         std::shared_ptr <std::vector<LoadCell *>> LCs,
-        std::shared_ptr <std::vector<ADC *>> ADCs,
+        //std::shared_ptr <std::vector<ADC *>> ADCs,
         std::shared_ptr <Logger> logger
 ) :
         open(true), scr(0), graph_count(0), graph_interval(1), machine(machine),
-        relays(relays), LCs(LCs), PTs(PTs), ADCs(ADCs), logger(logger) {
+        relays(relays), LCs(LCs), PTs(PTs), logger(logger) {
 
 
     setlocale(LC_ALL, "");
@@ -79,10 +79,10 @@ Display::Display(
     graph_srcs[8] = &((*PTs)[3]->*(&PT::temperature)); // T3: Ox Manifold
     graph_srcs[9] = &((*PTs)[4]->*(&PT::temperature)); // T4: Chamber
 
-    graph_srcs[10] = &(((*ADCs)[0]->*(&ADC::values))[0]);
-    graph_srcs[11] = &(((*ADCs)[0]->*(&ADC::values))[1]);
-    graph_srcs[12] = &(((*ADCs)[0]->*(&ADC::values))[2]);
-    graph_srcs[13] = &(((*ADCs)[0]->*(&ADC::values))[3]);
+    // graph_srcs[10] = &(((*ADCs)[0]->*(&ADC::values))[0]);
+    // graph_srcs[11] = &(((*ADCs)[0]->*(&ADC::values))[1]);
+    // graph_srcs[12] = &(((*ADCs)[0]->*(&ADC::values))[2]);
+    // graph_srcs[13] = &(((*ADCs)[0]->*(&ADC::values))[3]);
 
     graph_srcs[14] = &((*LCs)[0]->*(&LoadCell::weight)); // Fuel tank
 
@@ -126,10 +126,10 @@ void Display::update(bool update_now) {
                 for (auto *lc: *LCs) {
                     lc->kill();
                 }
-                for (auto *ADC: *ADCs) {
-                    ADC->is_alive = false;
-                    ADC->thread_obj->join();
-                }
+                // for (auto *ADC: *ADCs) {
+                //     ADC->is_alive = false;
+                //     ADC->thread_obj->join();
+                // }
                 endwin();
                 exit(0);
             }
@@ -231,8 +231,8 @@ void Display::draw_gauges() {
         mvwprintw(top_win, i + 1, 84, "%s: %d", Relay::channel_names[i], relays->get_output(i));
     }
 
-    mvwprintw(top_win, 6, 20, "Cooling inlet:  %5.0fV,    %5.2f°C", (*ADCs)[1]->values[1], 20.12);
-    mvwprintw(top_win, 7, 20, "Cooling outlet: %5.0fV,    %5.2f°C", (*ADCs)[1]->values[1], 21.12);
+    // mvwprintw(top_win, 6, 20, "Cooling inlet:  %5.0fV,    %5.2f°C", (*ADCs)[1]->values[1], 20.12);
+    // mvwprintw(top_win, 7, 20, "Cooling outlet: %5.0fV,    %5.2f°C", (*ADCs)[1]->values[1], 21.12);
     // for (int i = 0; i < 2; i++) {
     //     for (int j = 0; j < 4; j++) {
     //         mvwprintw(top_win, 5 + j, 44 + 20 * i, "ADC%d/%d: %5.0f", i, j, (*ADCs)[i]->values[j]);

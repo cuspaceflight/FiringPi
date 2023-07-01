@@ -27,7 +27,7 @@ public:
             std::shared_ptr <Relay> relays,
             std::shared_ptr <std::vector<PT *>> PTs,
             std::shared_ptr <std::vector<LoadCell *>> LCs,
-            std::shared_ptr <std::vector<ADC *>> ADCs,
+      //      std::shared_ptr <std::vector<ADC *>> ADCs,
             std::shared_ptr <Logger> logger
     );
 
@@ -53,7 +53,7 @@ private:
     std::shared_ptr <Relay> relays;
     std::shared_ptr <std::vector<LoadCell *>> LCs;
     std::shared_ptr <std::vector<PT *>> PTs;
-    std::shared_ptr <std::vector<ADC *>> ADCs;
+//    std::shared_ptr <std::vector<ADC *>> ADCs;
     std::shared_ptr <Logger> logger;
 
     std::chrono::time_point <std::chrono::system_clock> now, last;

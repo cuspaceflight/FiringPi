@@ -13,6 +13,7 @@ extern "C" {
 #include <sys/ioctl.h>
 #include <thread>
 #include <chrono>
+#include "../include/ADS1115.hpp"
 
 #define PMAX 350
 #define PMIN 0
@@ -23,9 +24,9 @@ public:
 
     float pressure, temperature, k_filter{0.4};
     int file, addr, freq;
-    bool* hold;
+    ADS1115 adc;
 
-    PT(int bus, int address, int frequency, bool* hold);
+    PT(int bus, int address, int frequency);
 
     bool setAddr(void);
     int recv();

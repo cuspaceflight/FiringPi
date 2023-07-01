@@ -21,14 +21,13 @@ enum Sensor {
 
 class ADC {
 public:
-    ADC(uint8_t bus, uint8_t address, int freq, bool* hold);
+    ADC(uint8_t bus, uint8_t address, int freq);
 
     uint8_t bus, address;
     int freq;
     float values[4], k_filter;
     bool is_alive;
     ADS1115 ads;
-    bool* hold;
 
     int recv();
     void loop();
