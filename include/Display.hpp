@@ -16,7 +16,7 @@
 #include "LoadCell.hpp"
 #include "ADC.hpp"
 
-#define NUM_SRCS 17 // TODO SUBTRACT 2
+#define NUM_SRCS 15 // TODO SUBTRACT 2
 #define NUM_SCREENS 4
 
 

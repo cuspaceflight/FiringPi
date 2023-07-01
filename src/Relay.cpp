@@ -1,16 +1,16 @@
 #include "Relay.hpp"
 
-const int Relay::pins[N_CHANNELS] = {26, 19, 11, 10, 27, 17, 6, 16};
+const int Relay::pins[N_CHANNELS] = {26, 6, 11, 10, 27, 17, 18, 18};
 
 const char* Relay::channel_names[N_CHANNELS] = {
         "---        CH0", // HE MAIN
         "N2O FILL   CH1",
-        "---        CH2", // CHAM VENT
-        "N2O VENT   CH3",
-        "IPA VENT   CH4",
-        "IGNITER-1  CH5",
-        "IGNITER-2  CH6",
-        "IGNITER-3  CH7"
+        "N2O VENT   CH2",
+        "IPA VENT   CH3",
+        "IGNITER-1  CH4",
+        "IGNITER-2  CH5",
+        "IGNITER-3  CH6",
+        "---        CH7", // CHAM VENT
 };
 
 Relay::Relay() {

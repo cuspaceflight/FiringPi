@@ -26,9 +26,7 @@ const char *Display::src_names[]{
         "ADC0/1",
         "ADC0/2",
         "ADC0/3",
-        "LC0: Fuel Tank",
-        "LC1: Ox Tank", // TODO REMOVE
-        "LC2: Thrust"   // TODO REMOVE
+        "LC0: Thrust",
 };
 
 Display::Display(
@@ -87,8 +85,7 @@ Display::Display(
     graph_srcs[13] = &(((*ADCs)[0]->*(&ADC::values))[3]);
 
     graph_srcs[14] = &((*LCs)[0]->*(&LoadCell::weight)); // Fuel tank
-    graph_srcs[15] = &((*LCs)[1]->*(&LoadCell::weight)); // Ox tank TODO REMOVE
-    graph_srcs[16] = &((*LCs)[2]->*(&LoadCell::weight)); // Thrust  TODO REMOVE
+
 
 
     for (int i = 0; i < NUM_SRCS; i++) {
@@ -229,8 +226,6 @@ void Display::draw_gauges() {
     mvwprintw(top_win, 5, 24, "T4: %f deg", (*PTs)[4]->temperature);
 
     mvwprintw(top_win, 1, 44, "LC0: %f N", (*LCs)[0]->get_weight()); // TODO NEW
-    mvwprintw(top_win, 2, 44, "LC1: %f", (*LCs)[1]->weight); // TODO REMOVE
-    mvwprintw(top_win, 3, 44, "LC2: %f", (*LCs)[2]->weight); // TODO REMOVE
 
     for (int i = 0; i < 8; i++) {
         mvwprintw(top_win, i + 1, 84, "%s: %d", Relay::channel_names[i], relays->get_output(i));

@@ -59,7 +59,7 @@ const bool StateMachine::transition_matrix[NUM_STATES][NUM_STATES]{
 const int StateMachine::valve_matrix[NUM_STATES][N_CHANNELS]{
         // HE MAIN(SERVO), N2O FILL(NO), CHAM VENT, N2O VENT, IPA VENT, IGNITER, IGNITER, IGNITER -- NOTE, ASSUMED ALL VALVES ARE NC, 1 = OPEN, 0 = CLOSED
         {1, 1, 1, 1, 1, 0, 0, 0}, // INIT
-        {0, 0, 1, 1, 1, 0, 0, 0}, // SAFE
+        {0, 0, 0, 0, 0, 0, 0, 0}, // SAFE
         {0, 0, 0, 0, 0, 0, 0, 0}, // READY
         {0, 0, 0, 0, 1, 0, 0, 0}, // FUEL FILL
         {0, 1, 0, 0, 0, 0, 0, 0}, // OX FILL
