@@ -27,6 +27,7 @@ public:
 
     PT(int bus, int address, int frequency, bool* hold);
 
+    bool setAddr(void);
     int recv();
     void loop();
 

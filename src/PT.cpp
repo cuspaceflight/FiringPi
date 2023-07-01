@@ -14,6 +14,7 @@ PT::PT(int bus, int address, int frequency, bool* hold)
         exit(1);
     }
 
+    std::cerr << "pt init" << (int) hold << "    " << (int) *hold << std::endl;
     while(*hold) {}
     *hold = true;
     if (ioctl(this->file, I2C_SLAVE, this->addr) < 0) {
@@ -22,12 +23,27 @@ PT::PT(int bus, int address, int frequency, bool* hold)
     }
     *hold = false;
     this->thread_obj = new std::thread(&PT::loop, this);
+    std::cerr << "pt init finished" << std::endl;
 
+}
+
+bool PT::setAddr(void)
+{
+    if (ioctl(this->file, I2C_SLAVE, this->addr) < 0) 
+    {
+        std::cerr << "Failed to set the I2C slave address." << std::endl;
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 int PT::recv() {
     while(*hold) {}
     *hold = true;
+    setAddr();
     char buf[4];
     if (read(file, buf, 4) != 4) { return -1; }
     *hold = false;

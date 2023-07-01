@@ -7,6 +7,8 @@ ADS1115::ADS1115(uint8_t bus, uint8_t address, bool* hold) : fd_(-1), bus_(bus),
 
 void ADS1115::reset(void)
 {
+    while(*hold) {}
+    *hold = true;
     setAddr();
     uint8_t buf[1];
     buf[1] = 0x06;
@@ -14,6 +16,7 @@ void ADS1115::reset(void)
     {
         std::cerr << "reset failed." << std::endl;
     }
+    *hold = false;
 }
 
 bool ADS1115::initialize()
