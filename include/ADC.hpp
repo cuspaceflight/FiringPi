@@ -11,6 +11,7 @@ extern "C" {
 #include <zconf.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include "../include/ADS1115.hpp"
 
 enum Sensor {
     SEEED_114991178,
@@ -20,16 +21,18 @@ enum Sensor {
 
 class ADC {
 public:
-    ADC(int bus, int addr, int freq);
+    ADC(uint8_t bus, uint8_t address, int freq, bool* hold);
 
-    Sensor types[4];
-    int file, freq;
+    uint8_t bus, address;
+    int freq;
     float values[4], k_filter;
+    bool is_alive;
+    ADS1115 ads;
+    bool* hold;
 
     int recv();
     void loop();
 
     std::thread* thread_obj;
-    bool is_alive;
 
 };

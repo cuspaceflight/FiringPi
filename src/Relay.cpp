@@ -1,6 +1,6 @@
 #include "Relay.hpp"
 
-const int Relay::pins[N_CHANNELS] = {26, 6, 11, 10, 27, 17, 18, 18};
+const int Relay::pins[N_CHANNELS] = {18, 26, 6, 11, 10, 27, 17, 18};
 
 const char* Relay::channel_names[N_CHANNELS] = {
         "---        CH0", // HE MAIN

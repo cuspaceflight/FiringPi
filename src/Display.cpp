@@ -231,12 +231,13 @@ void Display::draw_gauges() {
         mvwprintw(top_win, i + 1, 84, "%s: %d", Relay::channel_names[i], relays->get_output(i));
     }
 
-
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 4; j++) {
-            mvwprintw(top_win, 5 + j, 44 + 20 * i, "ADC%d/%d: %5.0f", i, j, (*ADCs)[i]->values[j]);
-        }
-    }
+    mvwprintw(top_win, 6, 20, "Cooling inlet:  %5.0fV,    %5.2f°C", (*ADCs)[1]->values[1], 20.12);
+    mvwprintw(top_win, 7, 20, "Cooling outlet: %5.0fV,    %5.2f°C", (*ADCs)[1]->values[1], 21.12);
+    // for (int i = 0; i < 2; i++) {
+    //     for (int j = 0; j < 4; j++) {
+    //         mvwprintw(top_win, 5 + j, 44 + 20 * i, "ADC%d/%d: %5.0f", i, j, (*ADCs)[i]->values[j]);
+    //     }
+    // }
 
     mvwprintw(top_win, 1, 64, "View: %d", scr);
 

@@ -23,8 +23,9 @@ public:
 
     float pressure, temperature, k_filter{0.4};
     int file, addr, freq;
+    bool* hold;
 
-    PT(int bus, int address, int frequency);
+    PT(int bus, int address, int frequency, bool* hold);
 
     int recv();
     void loop();

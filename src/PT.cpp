@@ -1,8 +1,8 @@
 #include "PT.hpp"
 
-PT::PT(int bus, int address, int frequency)
+PT::PT(int bus, int address, int frequency, bool* hold)
     : pressure(), temperature(), addr(address),
-    freq(frequency), is_alive(true) {
+    freq(frequency), is_alive(true), hold(hold) {
 
     char filename[20];
 
@@ -14,19 +14,23 @@ PT::PT(int bus, int address, int frequency)
         exit(1);
     }
 
+    while(*hold) {}
+    *hold = true;
     if (ioctl(this->file, I2C_SLAVE, this->addr) < 0) {
         std::cerr << "could not communicate with i2c addr " << addr << " on bus " << bus << std::endl;
         exit(1);
     }
-
+    *hold = false;
     this->thread_obj = new std::thread(&PT::loop, this);
 
 }
 
 int PT::recv() {
-
+    while(*hold) {}
+    *hold = true;
     char buf[4];
     if (read(file, buf, 4) != 4) { return -1; }
+    *hold = false;
     switch ((buf[0] & 0xc0)) {
         case 0x0 << 6:
             break;
